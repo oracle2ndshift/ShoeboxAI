@@ -1,0 +1,12 @@
+{
+  "general":      "General Income and Expenses",
+  "schedA":       "Schedule A Expenses",
+  "schedC":       "SChedule C income and expenses",
+  "schedE":       "Schedule E income and expenses",
+  "Royalty":      "Royalty Income",
+  "Partnership1": "Partnership 1",
+  "Partnership2": "Partnership 2",
+  "SCorp":        "S Corporation",
+  "EstateTrust":  "Estate or Trust",
+  "OtherEntity":  "Other Entity"
+}

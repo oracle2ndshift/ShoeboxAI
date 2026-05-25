@@ -1,0 +1,1167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <link rel="SHORTCUT ICON" href="gif/favicon.ico" type=text/css>
+  <link rel="stylesheet" href="db.css" type="text/css" />
+  <title>MBT ProdOpticlaim V20 Database</title>
+
+<script type="text/javascript">
+  function hint(item) {
+    var Str = "Command line options: ";
+    if (item == "clients")       { Str = "Optional qualifiers: name and client id "; } 
+    if (item == "claims")        { Str = "Required qualifiers: client and submitter identifier"; }
+    if (item == "students")      { Str = "Required qualifier: client id.  Optional: name"; }
+    if (item == "employees")     { Str = "Optional qualifier: client "; }
+    if (item == "providers")     { Str = "Optional qualifiers: client and user"; }
+    if (item == "ot_events")     { Str = "Required qualifiers: user and quarter"; }
+    if (item == "ot_samples")    { Str = "Required qualifiers: client and quarter"; }
+    if (item == "ot_comments")   { Str = "Required qualifiers: client and quarter"; }
+    if (item == "users_grants")  { Str = "Required qualifier: user"; }
+    if (item == "u_history")     { Str = "Required qualifier: user"; }
+    if (item == "c_history")     { Str = "Required qualifier: client"; }
+    if (item == "cpt")           { Str = "No options "; }
+    if (item == "engine_status") { Str = "No options "; }
+    if (item == "glog")          { Str = "No options "; }
+    if (item == "slog")          { Str = "No options "; }
+    if (item == "perf")          { Str = "No options "; }
+    if (item == "wait")          { Str = "No options "; }
+    if (item == "params")        { Str = "No options "; }
+    if (item == "db_sql")        { Str = "No options "; }
+    if (item == "objects")       { Str = "No options "; }
+    document.getElementById("msgbox").innerHTML = Str;
+  }
+</script>
+
+</head>
+<body>
+
+<?php include "env.php"; ?>
+
+<!-- header -->
+<div id="wrapper">
+  <div id="header">
+    <table width="100%">
+      <tr>
+        <td align=left width="30%" id="goBack">
+            <a href="index.html">
+              MBT DB<br>Prod OC/OT V20</a></td>
+        <td align=right width="70%">
+          <div id="nav_inline">
+          <form name="HeaderForm" method="post" action="<?php echo($php_self); ?>">
+            <ul id="nav_inline">
+              <li><br>Report<br><select name="v_catid" id="v_catid" 
+                     onChange="javascript:hint(this.value);" title="Select a report" >
+                  <option value="clients">Clients</option>
+                  <option value="claims">Claims</option>
+                  <option value="students">Students</option>
+                  <option value="employees">Employees</option>
+                  <option value='providers'>Users</option>
+                  <option value='ot_events'>OT Events</option>
+                  <option value='ot_samples'>OT Samples</option>
+                  <option value='ot_comments'>OT Comments</option>
+                  <option value='users_grants'>Users and Roles</option>
+                  <option value='u_history'>Users History Data</option>
+                  <option value='c_history'>Clients History Data</option>
+                  <option value='cpt'>CPT Codes</option>
+                  <option value='engine_status'>DB Status</option>
+                  <option value='glog'>General Log</option>
+                  <option value='slog'>Slow Query Log</option>
+                  <option value='perf'>Performance Stats</option>
+                  <option value='wait'>Thread Waiting</option>
+                  <option value='params'>DB Parameter Settings</option>
+                  <option value='db_sql'>DB SQL Code</option>
+                  <option value='objects'>DB Objects</option>
+ 
+              </select>
+              <li><br>Name Qualifier<br>
+                  <input name="v_qual" id="v_qual" type="text" size=10
+                          title="<?php echo ($form_q_title);?>" >
+              <li><br>Client Qualifier<br>
+                  <input name="v_qual2" id="v_qual2" type="text" size=10 value="0"
+                          title="<?php echo ($form_q_qual2);?>" >
+              <li><br>User Qualifier<br>
+                  <input name="v_qual5" id="v_qual5" type="text" size=10 value="0"
+                          title="<?php echo ($form_q_qual5);?>" >
+              <li><br>Quarter<br>
+                  <select name="v_qual6" id="v_qual6" title="Quarter - applies to OT only"> 
+                   <option value="2012-20131">2012-2013 Q1</option>
+                   <option value="2012-20132">2012-2013 Q2</option>
+                   <option value="2012-20133">2012-2013 Q3</option>
+                   <option value="2012-20134">2012-2013 Q4</option>
+                  </select>
+              <li><br>Submitter Identifier<br>
+                  <input name="v_qual3" id="v_qual3" type="text" size=5 value="0"
+                          title="<?php echo ($form_q_qual3);?>">
+              <li><br>Thread Id<br>
+                  <input name="v_qual4" id="v_qual4" type="text" size=5 value="0">
+              <li><br><br><input type="submit" name="GetQueDiv" value="Query"
+                          title="<?php echo ($form_submitque);?>" >
+            </ul>
+          </form>
+          </div>
+        </td></tr>
+        <tr><td colspan=4><font size="2px"</tr>
+          <p id="msgbox">Optional qualifiers: client and name </p>
+        </td></tr>
+    </table>
+  </div>
+  <div style="clear: both;"></div>
+</div>
+
+<!---  main div --->
+<div id="nav_main_wrap" >
+  <div id='main_dyn'>
+    <table>
+
+<?php
+//  include "dbconnect_stage2.php";
+//  include "dbconnect.php";
+  include "dbconnect_prodoptitime.php";
+
+    $sql_qual = " ";
+    $result = "";
+    $v_qual6 = " ";
+
+    // query 
+    if(!empty($_REQUEST['GetQueDiv'])) {
+      $v_catid    = $_POST['v_catid'];
+      $v_qual     = $_POST['v_qual'];
+      $v_qual2    = $_POST['v_qual2'];
+      $v_qual3    = $_POST['v_qual3'];
+      $v_qual4    = $_POST['v_qual4'];
+      $v_qual5    = $_POST['v_qual5'];
+      if(isset($_POST['v_qual6'])){ $v_qual6 = $_POST['v_qual6']; } 
+    
+      // ---------------- report 1---------------- 
+      if($v_catid == "rep1") {
+
+        // Account Manager e2
+        // LEA Client Services Manager e1
+        // Claims Analyst e3
+        // Financial Claims Analyst e4
+        // LEA Service Consultant e5
+        // MAA Client Services Manager e6
+        // MAA Analyst e7
+        // MAA Financial Analyst d8
+        // MAA Service Consultant e9
+        // MAA Lead e10
+        // 
+
+        $sql  = "select ";
+        $sql .= "  c.client_id clientid,";
+        $sql .= "  c.agency_type_id agency,";
+        $sql .= "  c.name name,";
+        $sql .= "  r.region_id region,";
+        $sql .= "  co.name county";
+        $sql .= " from Portal20.clients c, Portal20.regions r , Portal20.counties co";
+        $sql .= " where c.name like '%".$v_qual."%'";
+        $sql .= "   and r.region_id=c.region_id";
+        $sql .= "   and c.county_id=co.county_id";
+        $sql .= " group by c.client_id ";
+        $sql .= " order by c.name";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+        $sqltmp = "select count(*) cnt from Portal20.jobs where type='E'";
+        $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+        while ($row = mysql_fetch_array($tmp))
+        { $v_cnt_all = $row["cnt"]; }
+        
+//        $sqltmp = "select count(*) from Portal20.role where type='Optitime' and name!='User'";
+//        $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+//        while ($row = mysql_fetch_array($tmp))
+//        { $v_cnt_maa = $row["cnt"]; }
+// 
+//        $sqltmp = "select count(*) from Portal20.role where type='Opticlaim' and name!='User'";
+                                                             
+//        $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+//        while ($row = mysql_fetch_array($tmp))
+//        { $v_cnt_lea = $row["cnt"]; }
+
+        
+        echo ("<tr>".
+          "<th width='200px'>Client List where name like: '$v_qual' <br><br><br></th>".
+          "<th width='40px'></th>".
+          "<th width='40px'></th>".
+          "<th width='40px'></th>".
+          "<th width='40px'></th>".
+          "<th width='40px'></th>");
+   
+       for ($i=1; $i<=$v_cnt_all ; $i++)
+       { echo ("<th width='40px'></th>"); }
+
+       echo ("</tr>\n");
+
+
+       echo ("<tr>".
+                  "<th valign=bottom>Name</th>".
+                  "<th valign=bottom>Agency</th>".
+                  "<th valign=bottom>Region</th>".
+                  "<th valign=bottom>County</th>");
+
+       $sqltmp = "select name from Portal20.jobs where type='E'";
+       $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+       while ($row = mysql_fetch_array($tmp))
+       {  echo ("<th valign=bottom>".$row[name]."</th>"); }
+
+//       $sqltmp = "select name from Portal20.role where type='Opticlaim' and name!='User'";
+//       $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+//       while ($row = mysql_fetch_array($tmp))
+//       {  echo ("<th valign=bottom>".$row[name]."</th>"); }
+//
+//       $sqltmp = "select name from Portal20.role where type='Optitime' and name!='User'";
+//       $tmp = mysql_query($sqltmp); if (!$tmp) { die("Failed query:  sql=$sqltmp"); }
+//       while ($row = mysql_fetch_array($tmp))
+//       {  echo ("<th valign=bottom>".$row[name]."</th>"); }
+
+       echo ("</tr>\n");
+
+       while($row = mysql_fetch_array($result))
+       {
+          $v_id        = $row["clientid"];
+          $v_name      = $row["name"];
+          $v_agency    = $row["agency"];
+          $v_region    = $row["region"];
+          $v_county    = $row["county"];
+
+          if ($v_region == "0") { $v_region = "None"; }
+
+          $sql2  = "select j.job_id jid,j.type,Portal20.get_jobs_emps(".$v_id.",j.job_id) uname ";
+          $sql2 .= " from Portal20.jobs j ";
+          $sql2 .= " where type='E' group by j.job_id order by 1";
+          $v_jid_old = "none";
+
+          echo ("<tr>\n");
+          echo ("<td>".$v_name."</td><td>".$v_agency."</td><td>".$v_region."</td><td>".$v_county."</td><td>\n");
+
+          $tmp = mysql_query($sql2); if (!$tmp) { die("Failed query:  sql=$sql2"); }
+          while ($row = mysql_fetch_array($tmp))
+          { $v_jid       = $row["jid"]; 
+            $v_uname     = $row["uname"]; 
+
+            if ( $v_jid_old == $v_jid ) 
+            { echo ("<br>".$v_uname); }
+            else
+            { if ($v_jid_old != "none" )
+              { echo ("</td><td>".$v_uname); }
+              else
+              { echo ($v_uname); }
+            }
+            $v_jid_old   = $v_jid;  
+          }
+          echo ("</td>"); 
+
+          echo ( "</tr>\n");
+        }
+      }  // ---------------- system stats ----------------
+      elseif($v_catid == "db_sql") {
+
+        $sql  = "select routine_schema uname,routine_name name, ";
+        $sql .= " routine_type type ";
+        $sql .= " from information_schema.routines ";
+        $sql .= " where routine_schema not in ('mysql','dataload') ";
+        $sql .= " union ";
+        $sql .= " select trigger_schema uname,trigger_name name,'TRIGGER' type ";
+        $sql .= " from information_schema.triggers ";
+        $sql .= " where trigger_schema not in ('mysql','dataload') "; 
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='80px' align=right></th>".
+             "<th width='50px'>Database sql.  Click the routine name to see text body.<br><br><br></th>".
+             "<th width='50px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='80px' align=right>Schema</th>".
+                  "<th width='50px' align=left>Name</th>".
+                  "<th width='50px' align=left>Type</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+          $v_schema  = $row["uname"];
+          $v_name    = $row["name"];
+          $v_type    = $row["type"];
+
+          if ( $v_type == "FUNCTION" ) {$v_t = "_F_"; }
+          if ( $v_type == "PROCEDURE") {$v_t = "_P_"; }
+          if ( $v_type == "TRIGGER"  ) {$v_t = "_T_"; }
+   
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_schema."</td>\n");
+          echo ("<td align=left><A href='dat/stage/".$v_schema.$v_t.$v_name.".html' >".$v_name."</a></td>\n");
+          echo ("<td align=left>".$v_type."</a></td>\n");
+          echo ( "</tr>\n");
+        }
+      }
+      // ---------------- clients list---------------- 
+      elseif($v_catid == "clients") {
+
+        if($v_qual2 != '0' and $v_qual2 !='') {$sql_qual = " and client_id=".$v_qual2." ";}
+
+        $sql  = "select count(*) cnt,sum(if(status='A',1,0)) active from Portal20.clients u ";
+        $sql .= " where 1=1 ";
+        $sql .= $sql_qual;
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+        while($row = mysql_fetch_array($result))
+        {
+            $v_cnt  = $row["cnt"];
+            $v_cnta = $row["active"];
+        }
+
+        $sql = "select c.client_id id,c.name name,concat(c.street1,',',ifnull('',concat(', ',c.street2)),', ',c.city,', ',c.state,' ',c.zip) addr, c.phone, co.name county, c.region_id, c.npi,if(c.type_id&1,'OC','') oc_type,if(c.type_id&2,'OT','') ot_type from Portal20.clients c left join Portal20.counties co on (c.county_id=co.county_id) ";
+        $sql .= " where c.name like '%".$v_qual."%'";
+        $sql .= $sql_qual ;
+        $sql .= " order by c.name";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+  
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='200px' colspan=6>Client List where name like: '$v_qual' <br><br>Count=".$v_cnt." Active Count=".$v_cnta."<br></th>".
+             "</tr>\n");
+
+       echo ("<tr><th align=right>Id</th>".
+                  "<th width='50px'>Name</th>".
+                  "<th width='50px'>Address</th>".
+                  "<th width='30px'>Phone</th>".
+                  "<th width='30px'>County</th>".
+                  "<th width='10px'>Region</th>".
+                  "<th width='10px'>NPI</th>".
+                  "<th width='8px'>OC</th>".
+                  "<th width='8px'>OT</th>".
+                  "</tr>\n");
+  
+        while($row = mysql_fetch_array($result))
+        {
+            $v_id     = $row["id"];
+            $v_name   = $row["name"];
+            $v_addr   = $row["addr"];
+            $v_phone  = $row["phone"];
+            $v_county = $row["county"];
+            $v_region = $row["region_id"];
+            $v_npi    = $row["npi"];
+            $v_oc     = $row["oc_type"];
+            $v_ot     = $row["ot_type"];
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_id."</td>".
+                "<td>".$v_name."</td>".
+                "<td>".$v_addr."</td>".
+                "<td>".$v_phone."</td>".
+                "<td>".$v_county."</td>".
+                "<td>".$v_region."</td>".
+                "<td>".$v_npi."</td>\n".
+                "<td>".$v_oc."</td>\n".
+                "<td>".$v_ot."</td>\n");
+          echo ( "</tr>\n");
+        }
+      } // ---------------- claims data---------------- 
+      if($v_catid == "claims") {
+
+        if($v_qual2 != '0') {$sql_qual = " and id=".$v_qual2." ";} 
+        if($v_qual3 != '0' && $v_qual3 != '') {
+
+          $sql = " select h.charge_id,c.claim_id,h.minutes charge_minutes, ";
+          $sql .= "   c.expected_amount charge_price, ";
+          $sql .= "   h.service_date, ";
+          $sql .= "   h.status, ";
+          $sql .= "   h.client_id, ";
+          $sql .= "   concat(s.lastname,', ',s.firstname) student, ";
+          $sql .= "   concat(u.lastname,', ',u.firstname) provider, ";
+          $sql .= "   concat(cp.cpt_code,if(cp.modifiers='','','-'),cp.modifiers) cpt_code, ";
+          $sql .= "   d.icd_name, ";
+          $sql .= "   st.name service_type, ";
+          $sql .= "   c.paid_amount, ";
+          $sql .= "   r.reason_code adjustment_reason_code, ";
+          $sql .= "   c.claim_adjustment_reason_id, ";
+          $sql .= "   c.submitter_identifier ";
+          $sql .= " from Opticlaim20.charges h ";
+          $sql .= " left join Portal20.users u on (u.user_id=h.user_id) ";
+          $sql .= " left join Opticlaim20.claims c on (c.charge_id=h.charge_id) ";
+          $sql .= " left join Opticlaim20.claim_adjustment_reasons r on (r.claim_adjustment_reason_id=c.claim_adjustment_reason_id) ";
+          $sql .= " left join Opticlaim20.service_types st on (st.service_type_id=h.service_type_id) ";
+          $sql .= " left join Opticlaim20.cpt_codes cp on (cp.cpt_code_id=c.cpt_code_id) ";
+          $sql .= " left join Opticlaim20.diagnoses_service_types ds on (ds.service_type_id=h.service_type_id) ";
+          $sql .= " left join Opticlaim20.diagnoses d on (d.diagnosis_id=ds.diagnosis_id) ";
+          $sql .= " left join Portal20.students s on (s.student_id=h.student_id)";
+          $sql .= " where submitter_identifier like '".$v_qual3."%'   ";
+          $sql .= " and client_id=".$v_qual2." ";
+
+          $result = mysql_query($sql);
+          if (!$result) {
+              die("Failed query:  sql=$sql");
+          }
+    
+         echo ("<tr><th width='20px' align=right></th>".
+               "<th width='180px'>Claim id=$v_qual3 <br><br><br></th>".
+               "</tr>\n");
+  
+         echo ("<tr><th align=right>Id</th>".
+                    "<th>Name</th>".
+                    "</tr>\n");
+    
+          while($row = mysql_fetch_array($result))
+          {
+              $v_charge_minutes             = $row["charge_minutes"];
+              $v_charge_price               = $row["charge_price"];
+              $v_service_date               = $row["service_date"];
+              $v_status                     = $row["status"];
+              $v_client_id                  = $row["client_id"];
+              $v_student                    = $row["student"];
+              $v_provider                   = $row["provider"];
+              $v_cpt_code                   = $row["cpt_code"];
+              $v_icd_name                   = $row["icd_name"];
+              $v_service_type               = $row["service_type"];
+              $v_paid_amount                = $row["paid_amount"];
+              $v_adjustment_reason_code     = $row["adjustment_reason_code"];
+              $v_claim_adjustment_reason_id = $row["claim_adjustment_reason_id"];
+              $v_submitter_identifier       = $row["submitter_identifier"];
+              $v_charge_id                  = $row["charge_id"];
+              $v_claim_id                   = $row["claim_id"];
+  
+            echo ("<tr><td align=right>Charge Id</td><td align=left>".$v_charge_id."</td></tr>\n");
+            echo ("<tr><td align=right>Claim Id</td><td align=left>".$v_claim_id."</td></tr>\n");
+            echo ("<tr><td align=right>Charge Minutes</td><td align=left>".$v_charge_minutes."</td></tr>\n");
+            echo ("<tr><td align=right>Charge Price</td><td align=left>".$v_charge_price."</td></tr>\n");
+            echo ("<tr><td align=right>Paid</td><td align=left>".$v_paid_amount."</td></tr>\n");
+            echo ("<tr><td align=right>Service Type</td><td align=left>".$v_service_type."</td></tr>\n");
+            echo ("<tr><td align=right>Service Date</td><td align=left>".$v_service_date."</td></tr>\n");
+            echo ("<tr><td align=right>Charge Status</td><td align=left>".$v_status."</td></tr>\n");
+            echo ("<tr><td align=right>Student</td><td align=left>".$v_student."</td></tr>\n");
+            echo ("<tr><td align=right>Provider</td><td align=left>".$v_provider."</td></tr>\n");
+            echo ("<tr><td align=right>Client Id</td><td align=left>".$v_client_id."</td></tr>\n");
+            echo ("<tr><td align=right>Cpt Code</td><td align=left>".$v_cpt_code."</td></tr>\n");
+            echo ("<tr><td align=right>Icd Name</td><td align=left>".$v_icd_name."</td></tr>\n");
+            echo ("<tr><td align=right>adjustment_reason_code</td><td align=left>".$v_adjustment_reason_code."</td></tr>\n");
+          }
+        }
+
+      }  // ---------------- students list ---------------- 
+      elseif($v_catid == "students") {
+        if($v_qual2 != '0') {$sql_qual = " and s.client_id=".$v_qual2." ";}
+
+        // 
+        // get summary counts first 
+        //
+        $sql2  = "select sum(if(s.iep='Y',1,0)) iep_cnt, ";
+        $sql2 .= "      sum(if(s.medical_eligible='Y',1,0)) med_cnt, ";
+        $sql2 .= "      sum(if(s.active='Y',1,0)) act_cnt ";
+        $sql2 .= "from Portal20.students s  ";
+        $sql2 .= "where lastname like '".$v_qual."%'";
+        $sql2 .= " and s.active='Y' " ;
+        $sql2 .= $sql_qual ;
+
+        $result = mysql_query($sql2);
+        if (!$result) {
+            die("Failed query:  sql=$sql2");
+        }
+        while($row = mysql_fetch_array($result))
+        {
+            $v_iep_cnt = $row["iep_cnt"];
+            $v_med_cnt = $row["med_cnt"];
+            $v_act_cnt = $row["act_cnt"];
+        }
+
+        // 
+        // get summary counts first 
+        //
+        $sql2  = "select count(*) tot_cnt ";
+        $sql2 .= "from Portal20.students s  ";
+        $sql2 .= "where lastname like '".$v_qual."%'";
+        $sql2 .= $sql_qual ;
+
+        $result = mysql_query($sql2);
+        if (!$result) {
+            die("Failed query:  sql=$sql2");
+        }
+        while($row = mysql_fetch_array($result))
+        {
+            $v_tot_cnt = $row["tot_cnt"];
+        }
+
+        // 
+        // get main data 
+        //
+        $sql = "select s.student_id id,lastname , ";
+        $sql .= " firstname , dob birthday, ssn, bic, name,s.iep,s.iep_effective_date,s.medical_eligible ";
+        $sql .= " from Portal20.students s, Portal20.clients c ";
+        $sql .= " where lastname like '".$v_qual."%'";
+        $sql .= $sql_qual ;
+        $sql .= " order by lastname,firstname";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='80px'>Student List where last_name like: '$v_qual'<br><br><br></th>".
+             "<th width='70px'>Counts:</th>".
+             "<th width='70px'>Iep<br>".$v_iep_cnt."</th>".
+             "<th width='70px'>Medi-cal<br>".$v_med_cnt."</th>".
+             "<th width='70px'>Active<br>".$v_act_cnt."</th>".
+             "<th width='50px'>All<br>".$v_tot_cnt."</th>".
+             "<th width='70px'></th>".
+             "<th width='50px'></th>".
+             "<th width='180px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px' align=right>Id</th>".
+                  "<th width='80px'>Last Name</th>".
+                  "<th width='80px'>First Name</th>".
+                  "<th width='80px'>Birthday</th>".
+                  "<th width='80px'>SSN</th>".
+                  "<th width='80px'>BIC</th>".
+                  "<th width='80px'>IEP</th>".
+                  "<th width='80px'>IEP Date</th>".
+                  "<th width='80px'>Medi-cal Eligible</th>".
+                  "<th width='180px'>Client</th>".
+                  "</tr>\n");
+  
+        while($row = mysql_fetch_array($result))
+        {
+            $v_id         = $row["id"];
+            $v_name       = $row["name"];
+            $v_last_name  = $row["lastname"];
+            $v_first_name = $row["firstname"];
+            $v_bday       = $row["birthday"];
+            $v_ssn        = $row["ssn"];
+            $v_bic        = $row["bic"];
+            $v_iep        = $row["iep"];
+            $v_iep_date   = $row["iep_effective_date"];
+            $v_medical    = $row["medical_eligible"];
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_id."</td><td>".$v_last_name."</td><td>".$v_first_name."</td><td>".$v_bday."</td><td>".$v_ssn."</td><td>".$v_bic."</td><td>".$v_iep."</td><td>".$v_iep_date."</td><td>".$v_medical."</td><td>".$v_name."</td>\n");
+          echo ( "</tr>\n");
+        }
+      }   // ---------------- providers list ---------------- 
+      elseif($v_catid == "providers") {
+        if($v_qual2 != '0') {$sql_qual = " and c.client_id=".$v_qual2." ";}
+        if($v_qual5 != '0') {$sql_qual = " and u.user_id=".$v_qual5." ";}
+
+        $sql  = "select count(*) count from Portal20.users u, Portal20.client_users c ";
+        $sql .= " where lastname like '%".$v_qual."%'";
+        $sql .= " and u.user_id=c.user_id ";
+        $sql .= $sql_qual; 
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+        while($row = mysql_fetch_array($result))
+        {
+            $v_cnt = $row["count"];
+        }
+
+        $sql  = "select sum(if(r.name='Opticlaim_Practitioner',1,0)) cnt_OC, ";
+        $sql .= "   sum(if(r.name='OptiTime_Participant',1,0)) cnt_OT";
+        $sql .= " from Portal20.role_grants rg,";
+        $sql .= "   Portal20.client_users cu,";
+        $sql .= "   Portal20.roles r,";
+        $sql .= "   Portal20.clients c,";
+        $sql .= "   Portal20.users u";
+        $sql .= " where rg.client_user_id=cu.client_user_id";
+        $sql .= " and   cu.user_id=u.user_id ";
+        $sql .= " and   cu.client_id=c.client_id ";
+        $sql .= " and   r.role_id=rg.role_id ";
+        $sql .= $sql_qual;
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+        while($row = mysql_fetch_array($result))
+        {
+            $v_cnt_oc = $row["cnt_OC"];
+            $v_cnt_ot = $row["cnt_OT"];
+        }
+
+        $sql = "select u.user_id uid,c.client_id id,lastname, firstname , name , ";
+        $sql .= " sum(if(ifnull(h.charge_id,0)=0,0,1)) cnt, u.email, ";
+        $sql .= " Portal20.get_user_jobs(ifnull(c.client_id,0),u.user_id,'%') jobs,";
+        $sql .= " Portal20.get_grant_type(u.user_id,'P') OCtype,Portal20.get_grant_type(u.user_id,'U') OTtype,";
+        $sql .= " u.status,u.authenticated ";
+        $sql .= " from Portal20.users u ";
+        $sql .= " left join Portal20.client_users cu on cu.user_id=u.user_id ";
+        $sql .= " left join Portal20.clients c on cu.client_id=c.client_id ";
+        $sql .= " left join Opticlaim20.charges h on h.user_id=u.user_id ";
+        $sql .= " where lastname like '%".$v_qual."%'";
+        $sql .= $sql_qual;
+        $sql .= " group by u.user_id ";
+        $sql .= " order by u.lastname,u.firstname";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='20px'></th>".
+             "<th width='30px'>User List where last_name like: '$v_qual'<br><br><br></th>".
+             "<th width='20px'>Count:</th>".
+             "<th width='20px'>".$v_cnt."</th>".
+             "<th width='60px'></th>".
+             "<th width='100px'>Count OT=".$v_cnt_ot."  OC=".$v_cnt_oc."</th>".
+             "<th width='10px'>Status</th>".
+             "<th width='10px'></th>".
+             "<th width='10px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px' align=right>Client</th>".
+                  "<th width='20px'>UserId</th>".
+                  "<th width='30px'>Last Name</th>".
+                  "<th width='20px'>First Name</th>".
+                  "<th width='20px'>Claims</th>".
+                  "<th width='60px'>Email</th>".
+                  "<th width='100px'>Jobs</th>".
+                  "<th width='10px'>Auth</th>".
+                  "<th width='10px'>OC</th>".
+                  "<th width='10px'>OT</th>".
+                  "</tr>\n");
+  
+        while($row = mysql_fetch_array($result))
+        {
+            $v_uid        = $row["uid"];
+            $v_id         = $row["id"];
+            $v_name       = $row["name"];
+            $v_count      = $row["cnt"];
+            $v_last_name  = $row["lastname"];
+            $v_first_name = $row["firstname"];
+            $v_jobs       = $row["jobs"];
+            $v_email      = $row["email"];
+            $v_cnt        = $row["cnt"];
+            $v_OC         = $row["OCtype"];
+            $v_OT         = $row["OTtype"];
+            $v_status     = $row["status"];
+            $v_auth       = $row["authenticated"];
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_id."</td><td>".$v_uid."</td><td>".$v_last_name."</td><td>".$v_first_name."</td><td>".$v_cnt."</td><td>".$v_email."</td><td>".$v_jobs."</td><td>".$v_status.$v_auth."</td><td>".$v_OC."</td><td>".$v_OT."</td>\n");
+          echo ( "</tr>\n");
+        }
+      }   // ---------------- users_grants list ----------------
+      elseif($v_catid == "users_grants") {
+        if($v_qual2 != '0') {$sql_qual = " and cu.client_id=".$v_qual2." ";}
+        if($v_qual5 != '0') {$sql_qual = " and u.user_id=".$v_qual5." ";}
+
+        $sql  = "select u.user_id uid,rtrim(concat(lastname,' ,',firstname)) name, ";
+        $sql .= " group_concat(distinct cu.client_id) cid, u.email email, ";
+        $sql .= " group_concat(r.name) roles ";
+        $sql .= " from Portal20.users u ";
+        $sql .= " left join Portal20.client_users cu on (cu.user_id=u.user_id) ";
+        $sql .= " left join Portal20.role_grants rg on (cu.client_user_id=rg.client_user_id) ";
+        $sql .= " left join Portal20.roles r  on (r.role_id=rg.role_id) ";
+        $sql .= " where 1=1 ";
+        $sql .= $sql_qual;
+        $sql .= " group by u.user_id ";
+        $sql .= " order by lastname,firstname ";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+        echo ("<tr><th width='20px' align=right></th>".
+             "<th width='20px'></th>".
+             "<th width='50px'>User List where: '$v_qual'<br><br><br></th>".
+             "<th width='60px'></th>".
+             "<th width='100px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px' align=right>Clients</th>".
+                  "<th width='20px'>UserId</th>".
+                  "<th width='50px'>Name</th>".
+                  "<th width='60px'>Email</th>".
+                  "<th width='100px'>Roles</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+          $v_uid        = $row["uid"];
+          $v_cid        = $row["cid"];
+          $v_name       = $row["name"];
+          $v_roles      = $row["roles"];
+          $v_email      = $row["email"];
+
+          if($v_cid   == "NULL") {$v_cid   = "";}
+          if($v_roles == "NULL") {$v_roles = "";}
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_cid."</td><td>".$v_uid."</td><td>".$v_name."</td><td>".$v_email."</td><td>".$v_roles."</td>\n");
+          echo ( "</tr>\n");
+        }
+      }   // ---------------- ot_events list ----------------
+      elseif($v_catid == "ot_events") {
+        if($v_qual5 == '0') {echo ("Error: Please select a user id.");}
+        $sql_qual = " and ts.user_id=".$v_qual5." ";
+        if($v_qual6 != ' ') {
+          $v_period_id = substr($v_qual6,0,9);
+          $v_quarter   = substr($v_qual6,9,1);
+
+          $sql  = "select ts.time_survey_id tsid,ts.user_id uid,period_id pid,quarter qtr,dayno, ";
+          $sql .= " begin_time bt, end_time et,minutes min,activity_id act ";
+          $sql .= " from Optitime20.time_surveys ts, Optitime20.time_details td, ";
+          $sql .= "      Optitime20.time_survey_details tsd ";
+          $sql .= " where ts.time_survey_id=tsd.time_survey_id and ts.week_id=td.week_id ";
+          $sql .= $sql_qual;
+          $sql .= " and td.period_id='".$v_period_id."' and td.quarter=".$v_quarter." ";
+          $sql .= " order by ts.time_survey_id,dayno,begin_time ";
+  
+          $result = mysql_query($sql);
+          if (!$result) {
+              die("Failed query:  sql=$sql");
+          }
+          echo ("<tr><th colspan=9> Time survey event list for user=".$v_qual5." period=".$v_period_id." quarter=".$v_quarter."<br><br><br></th>\n");
+  
+          echo ("<tr><th width='20px'>TS id</th>".
+               "<th width='20px'>User</th>".
+               "<th width='10px'>Period</th>".
+               "<th width='10px'>Qtr</th>".
+               "<th width='10px'>Day</th>".
+               "<th width='10px'>Begin</th>".
+               "<th width='10px'>End</th>".
+               "<th width='10px'>Min</th>".
+               "<th width='20px'>Activity</th>".
+               "</tr>\n");
+  
+          while($row = mysql_fetch_array($result))
+          {
+            $v_tsid       = $row["tsid"];
+            $v_uid        = $row["uid"];
+            $v_pid        = $row["pid"];
+            $v_qtr        = $row["qtr"];
+            $v_dayno      = $row["dayno"];
+            $v_bt         = $row["bt"];
+            $v_et         = $row["et"];
+            $v_min        = $row["min"];
+            $v_act        = $row["act"];
+  
+            echo ("<tr>\n");
+            echo ("<td align=right>".$v_tsid."</td><td>".$v_uid."</td><td>".$v_pid."</td><td>".$v_qtr."</td><td>".$v_dayno."</td><td>".$v_bt."</td><td>".$v_et."</td><td>".$v_min."</td><td>".$v_act."</td>\n");
+            echo ( "</tr>\n");
+          }
+        } else {echo ("Error: Please select a quarter.");}
+      }   // ---------------- ot_samples list ----------------
+      elseif($v_catid == "ot_samples") {
+        if($v_qual2 == '0') {echo ("Error: Please select a client id.");}
+        if($v_qual6 != ' ') {
+          $v_period_id = "'".substr($v_qual6,0,9)."'";
+          $v_quarter   = substr($v_qual6,9,1);
+          $sql = "call Optitime20.report_samples($v_qual2,$v_period_id,$v_quarter)";
+ 
+          echo ("<tr><td>");
+          echo ("Samples report for client=".$v_qual2." period=".$v_period_id." quarter=".$v_quarter); 
+          echo ("</tr></td>");
+
+          $dummy = "mysql -udba -p1liketotally -h prodall.cx5ale3faqta.us-east-1.rds.amazonaws.com -H -e \"".$sql."\" ";
+          $output = shell_exec($dummy);
+  
+          echo ("<tr><td>");
+          echo "$output";
+          echo ("</td></tr>");
+        } else {echo ("Error: Please select a quarter.");}
+      }  // ---------------- ot_comments list ----------------
+      elseif($v_catid == "ot_comments") {
+        if($v_qual2 == '0') {echo ("Error: Please select a client id.");}
+        if($v_qual6 != ' ') {
+          $v_period_id = "'".substr($v_qual6,0,9)."'";
+          $v_quarter   = substr($v_qual6,9,1);
+          $sql = "call Optitime20.report_comments($v_qual2,$v_period_id,$v_quarter)";
+
+          echo ("<tr><td>");
+          echo ("Comments report for client=".$v_qual2." period=".$v_period_id." quarter=".$v_quarter);
+          echo ("</tr></td>");
+
+          $dummy = "mysql -udba -p1liketotally -h prodall.cx5ale3faqta.us-east-1.rds.amazonaws.com -H -e \"".$sql."\" ";
+          $output = shell_exec($dummy);
+
+          echo ("<tr><td>");
+          echo "$output";
+          echo ("</td></tr>");
+        } else {echo ("Error: Please select a quarter.");}
+      } // ---------------- engine_status ----------------
+      elseif($v_catid == "engine_status") {
+        
+          $v_period_id = "'".substr($v_qual6,0,9)."'";
+          $v_quarter   = substr($v_qual6,9,1);
+          $sql = "show engine innodb status";
+
+          $dummy = "mysql -udba -p1liketotally -h prodall.cx5ale3faqta.us-east-1.rds.amazonaws.com -H -e \"".$sql."\" ";
+          $output = shell_exec($dummy);
+
+          echo ("<tr><td>");
+          echo str_replace('LATEST FOREIGN KEY ERROR','<br><br>LATEST FOREIGN KEY ERROR',
+               str_replace('BACKGROUND THREAD','<br><br>BACKGROUND THREAD',
+               str_replace('LATEST DETECTED DEADLOCK','<br><br>LATEST DETECTED DEADLOCK',
+               str_replace('TRANSACTIONS','<br><br>TRANSACTIONS',
+               str_replace('TRANSACTION ','<br>TRANSACTION ',
+               str_replace('ROW OPERATIONS','<br><br>ROW OPERATIONS',
+               str_replace('INSERT BUFFER ','<br><br>INSERT BUFFER ',
+               str_replace('FILE I/O','<br><br>FILE I/O',
+               str_replace('BUFFER POOL','<br><br>BUFFER POOL',
+               str_replace('END OF INNODB','<br><br>END OF INNODB',
+               $output))))))))));
+          echo ("</td></tr>");
+       
+      } // ---------------- user_history ---------------- 
+      elseif($v_catid == "u_history") {
+        if($v_qual5 != '0') {
+          $sql_qual = " and u.user_id=".$v_qual5." "; 
+
+        }
+        else {
+          echo ("<tr><td>Error: Must qualify on User id for this option.  Please try again</td></tr>");
+        }
+      } // ---------------- client_history ---------------- 
+      elseif($v_catid == "c_history") {
+        if($v_qual2 != '0') {
+          $sql_qual = " and c.client_id=".$v_qual2." ";
+        } 
+        else {
+          echo ("<tr><td>Error: Must qualify on Client id for this option.  Please try again</td></tr>");
+        }
+      } // ---------------- cpt codes ---------------- 
+      elseif($v_catid == "cpt") {
+ 
+        $sql = "select cpt_code_id id,cpt_code,modifiers,extra_minute_cpt_code_id,";
+        $sql .= " cpt_descr,extra_minute_cpt_code_id ";
+        $sql .= " from Opticlaim20.cpt_codes ";
+        $sql .= " order by cpt_code,modifiers";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+  
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='50px' colspan=2>Cpt Code List:<br><br><br></th>".
+             "<th width='30px'></th>".
+             "<th width='15px'></th>".
+             "<th width='30px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px' align=right>Id</th>".
+                  "<th width='30px'>CPT Code</th>".
+                  "<th width='20px'>Modifiers</th>".
+                  "<th width='20px'>Extra Id</th>".
+                  "<th width='20px'>Cpt Descr</th>".
+                  "</tr>\n");
+  
+        while($row = mysql_fetch_array($result))
+        {
+            $v_id            = $row["id"];
+            $v_cpt_code      = $row["cpt_code"];
+            $v_modifiers     = $row["modifiers"];
+            $v_extra_id      = $row["extra_minute_cpt_code_id"];
+            $v_cpt_descr     = $row["cpt_descr"];
+
+          echo ("<tr>\n");
+          echo ("<td align=right>".$v_id."</td><td>".$v_cpt_code."</td><td>".$v_modifiers."</td><td>".$v_extra_id."</td><td>".$v_cpt_descr."</td>\n");
+          echo ( "</tr>\n");
+        }
+      }   // ---------------- employees list ----------------
+      elseif($v_catid == "employees") {
+
+        if($v_qual2 != '0') {$sql_qual = " and u.user_id in (select user_id from Portal20.client_employees ce where ce.client_id=".$v_qual2." )";}
+
+        $sql = "select u.user_id id,u.lastname , ";
+        $sql .= " u.firstname ,Portal20.get_client_emps(u.user_id) name,concat(u.addr1,', ',u.city,', ',u.state,' ',u.zip) address,u.phone ";
+        $sql .= " from Portal20.users u ";
+        $sql .= " where lastname like '%".$v_qual."%' and u.user_cat='E' ";
+        $sql .= $sql_qual;
+        $sql .= " order by lastname,firstname";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='100px'>Employee List where client_id = '$v_qual2'<br><br><br></th>".
+             "<th width='100px'></th>".
+             "<th width='80px'></th>".
+             "<th width='180px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px'>Id</th>".
+                  "<th width='50px'>Last Name</th>".
+                  "<th width='30px'>First Name</th>".
+                  "<th width='180px'>Address</th>".
+                  "<th width='30px'>Phone</th>".
+                  "<th width='180px'>Client</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+            $v_id         = $row["id"];
+            $v_name       = $row["name"];
+            $v_last_name  = $row["lastname"];
+            $v_first_name = $row["firstname"];
+            $v_address    = $row["address"];
+            $v_phone      = $row["phone"];
+
+          echo ("<tr>\n");
+          echo ("<td>".$v_id."</td><td>".$v_last_name."</td><td>".$v_first_name."</td><td>".$v_address."</td><td>".$v_phone."</td><td>".$v_name."</td>\n");
+          echo ( "</tr>\n");
+        }
+      } // ---------------- system stats ---------------- 
+      elseif($v_catid == "glog") {
+ 
+        $sql = "select event_time,user_host,thread_id,server_id,command_type,argument";
+        $sql .= " from mysql.general_log ";
+        $sql .= " where user_host not like '%localhost%' ";
+        $sql .= " order by event_time desc limit 1000";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+  
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='100px'>The general sql log, last 1000 rows...<br><br><br></th>".
+             "<th width='80px'></th>".
+             "<th width='180px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px'>Time</th>".
+                  "<th width='100px'>User Host</th>".
+                  "<th width='80px'>Type</th>".
+                  "<th width='180px'>Command</th>".
+                  "</tr>\n");
+  
+        while($row = mysql_fetch_array($result))
+        {
+            $v_event_time  = $row["event_time"];
+            $v_user_host   = $row["user_host"];
+            $v_type        = $row["command_type"];
+            $v_command     = $row["argument"];
+
+          echo ("<tr>\n");
+          echo ("<td>".$v_event_time."</td><td>".$v_user_host."</td><td>".$v_type."</td><td>".$v_command."</td>\n");
+          echo ( "</tr>\n");
+        }
+      } 
+      elseif($v_catid == "slog") {
+
+        $sql = "select start_time,user_host,query_time,lock_time,rows_sent,";
+        $sql .= " rows_examined,db,sql_text ";
+        $sql .= " from  mysql.slow_log ";
+        $sql .= " where user_host not like '%localhost%' ";
+        $sql .= " order by start_time desc limit 1000";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='20px' align=right></th>".
+             "<th width='100px'>The slow query log, last 1000 rows...'<br><br><br></th>".
+             "<th width='20px'></th>".
+             "<th width='20px'></th>".
+             "<th width='20px'></th>".
+             "<th width='20px'></th>".
+             "<th width='200px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th width='20px'>Time</th>".
+                  "<th width='100px'>User Host</th>".
+                  "<th width='20px'>Query Time</th>".
+                  "<th width='20px'>Lock Time</th>".
+                  "<th width='20px'>Rows Sent</th>".
+                  "<th width='20px'>Rows Found</th>".
+                  "<th width='200px'>SQL Text</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+            $v_start_time  = $row["start_time"];
+            $v_user_host   = $row["user_host"];
+            $v_query_time  = $row["query_time"];
+            $v_lock_time   = $row["lock_time"];
+            $v_rows_sent   = $row["rows_sent"];
+            $v_rows_found  = $row["rows_examined"];
+            $v_sql_text    = $row["sql_text"];
+
+          echo ("<tr>\n");
+          echo ("<td>".$v_start_time."</td><td>".$v_user_host."</td><td>".$v_query_time."</td><td>".$v_lock_time."</td><td>".$v_rows_sent."</td><td>".$v_rows_found."</td><td>".$v_sql_text."</td>\n");
+          echo ( "</tr>\n");
+        }
+      }
+      elseif($v_catid == "perf") {
+
+        $sql4 = "select ";
+        $sql4 .= " thread_id,event_id,event_name,source,timer_start,timer_end,timer_wait, ";
+        $sql4 .= " spins,object_schema,object_name,object_type,object_instance_begin, ";
+        $sql4 .= " nesting_event_id,operation,number_of_bytes,flags ";
+        $sql4 .= " from performance_schema.events_waits_current";
+
+        $result = mysql_query($sql4);
+        if (!$result) {
+            die("Failed query:  sql=$sql4");
+        }
+
+        echo ("<tr><th width='100px'>Current wait events<br><br><br></th><th width=50px></th></tr>\n");
+
+        $i = 0;
+        while($row = mysql_fetch_array($result))
+        {
+            $i = $i + 1;
+            $v_thread_id        = $row["thread_id"];
+            $v_event_id         = $row["event_id"];
+            $v_event_name       = $row["event_name"];
+            $v_source           = $row["source"];
+            $v_timer_start      = $row["timer_start"];
+            $v_timer_end        = $row["timer_end"];
+            $v_timer_wait       = $row["timer_wait"];
+            $v_spins            = $row["spins"];
+            $v_object_schema    = $row["object_schema"];
+            $v_object_name      = $row["object_name"];
+            $v_object_type      = $row["object_type"];
+            $v_object_instance_begin  = $row["object_instance_begin"];
+            $v_nesting_event_id = $row["nesting_event_id"];
+            $v_operation        = $row["operation"];
+            $v_number_of_bytes  = $row["number_of_bytes"];
+            $v_flags            = $row["flags"];
+
+            echo ("<tr><th colspan=2>----------------------Row ".$i."-----------------------------</th></tr>\n");
+            echo ("<tr><td align=right>Thread Id</td><td>".$v_thread_id."</td></tr>\n");
+            echo ("<tr><td align=right>Event Id</td><td>".$v_event_id."</td></tr>\n");
+            echo ("<tr><td align=right>Event Name</td><td>".$v_event_name."</td></tr>\n");
+            echo ("<tr><td align=right>Sourced</td><td>".$v_source."</td></tr>\n");
+            echo ("<tr><td align=right>Timer Start</td><td>".$v_timer_start."</td></tr>\n");
+            echo ("<tr><td align=right>Timer End</td><td>".$v_timer_end."</td></tr>\n");
+            echo ("<tr><td align=right>Timer Wait</td><td>".$v_timer_wait."</td></tr>\n");
+            echo ("<tr><td align=right>Spins</td><td>".$v_spins."</td></tr>\n");
+            echo ("<tr><td align=right>Object Schema</td><td>".$v_object_schema."</td></tr>\n");
+            echo ("<tr><td align=right>Object Name</td><td>".$v_object_name."</td></tr>\n");
+            echo ("<tr><td align=right>Object Type</td><td>".$v_object_type."</td></tr>\n");
+            echo ("<tr><td align=right>Object Instance Name</td><td>".$v_object_instance_begin."</td></tr>\n");
+            echo ("<tr><td align=right>Nesting Event Id</td><td>".$v_nesting_event_id."</td></tr>\n");
+            echo ("<tr><td align=right>Operations</td><td>".$v_operation."</td></tr>\n");
+            echo ("<tr><td align=right>Number of Bytes</td><td>".$v_number_of_bytes."</td></tr>\n");
+            echo ("<tr><td align=right>Flags</td><td>".$v_flags."</td></tr>\n");
+        }
+
+        $sql = "select event_name, count_star";
+        $sql .= " from performance_schema.events_waits_summary_global_by_event_name";
+        $sql .= " order by count_star desc limit 10";
+
+        $result = mysql_query($sql);
+        if (!$result) {
+            die("Failed query:  sql=$sql");
+        }
+
+       echo ("<tr><th width='100px'>Summary wait events by name<br><br><br></th>".
+             "<th width='50px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th align=right width='100px'>Event</th>".
+                  "<th width='50px'>Time</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+            $v_event_name  = $row["event_name"];
+            $v_count_star  = $row["count_star"];
+            echo ("<tr><td align=right>".$v_event_name."</td><td>".$v_count_star."</td></tr>\n");
+        }
+
+        $sql2 =  "select event_name, sum_timer_wait";
+        $sql2 .= " from performance_schema.events_waits_summary_global_by_event_name";
+        $sql2 .= " order by sum_timer_wait desc limit 10";
+
+        $result = mysql_query($sql2);
+        if (!$result) {
+            die("Failed query:  sql=$sql2");
+        }
+
+       echo ("<tr><th width='100px'><br><br>Summary wait events by timer wait<br><br><br></th>".
+             "<th width='50px'></th>".
+             "</tr>\n");
+
+       echo ("<tr><th align=right width='100px'>Event</th>".
+                  "<th width='50px'>Timer Wait</th>".
+                  "</tr>\n");
+
+        while($row = mysql_fetch_array($result))
+        {
+            $v_event_name  = $row["event_name"];
+            $v_sum_timer_wait  = $row["sum_timer_wait"];
+            echo ("<tr><td align=right>".$v_event_name."</td><td>".$v_sum_timer_wait."</td></tr>\n");
+        }
+
+      }
+      // ---------------- thread waiting----------------
+      elseif($v_catid == "wait") {
+
+        if($v_qual4 != '0' and $v_qual4 !='') {
+          $sql  = " select event_id, event_name, timer_wait ";
+          $sql .= "  from performance_schema.events_waits_history  ";
+          $sql .= "  where thread_id = ".$v_qual4;
+          $sql .= "  order by event_id";
+
+          $result = mysql_query($sql);
+          if (!$result) {
+              die("Failed query:  sql=$sql");
+          }
+
+         echo ("<tr><th width='100px'><br><br>Wait Events for Thread ".$v_qual4."<br><br><br></th>".
+               "<th width='50px'></th>".
+               "</tr>\n");
+
+         echo ("<tr><th align=right width='100px'>Id</th>".
+                    "<th width='50px'>Event Name</th>".
+                    "<th width='50px'>Timer Wait</th>".
+                    "</tr>\n");
+
+          while($row = mysql_fetch_array($result))
+          {
+              $v_event_id    = $row["event_id"];
+              $v_event_name  = $row["event_name"];
+              $v_timer_wait  = $row["timer_wait"];
+              echo ("<tr><td align=right>".$v_event_id."</td><td>".$v_event_name."</td><td>".$v_timer_wait."</td></tr>\n");
+          }
+        }
+        else {
+          echo ("Must enter a thread id value.\n");
+        }
+      }
+
+      elseif($v_catid == "params") {
+        echo ("<tr><td><pre>");
+        readfile('params_debug.dat');
+        echo ("</pre></td></tr>");
+      }
+      elseif($v_catid == "objects") {
+        echo ("<tr><td>");
+        $output = shell_exec('ls -lart');
+        
+        $output = shell_exec('mysql -udba -pground0 -h stgopticlaim.cx5ale3faqta.us-east-1.rds.amazonaws.com -H -e "select TABLE_SCHEMA,TABLE_NAME,ENGINE,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,CREATE_TIME,update_time,TABLE_COLLATION  from information_schema.tables where TABLE_SCHEMA not in (\'dataload\',\'mysql\',\'information_schema\');"');
+
+        echo "<pre>$output</pre>";
+        echo ("</td></tr>");
+      }
+
+      if (is_resource($result) ) {mysql_free_result($result);}
+    }
+
+?>
+  </table></div>
+</div>
+</body>
+</html>
+

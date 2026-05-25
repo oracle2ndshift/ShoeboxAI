@@ -1,0 +1,266 @@
+/* filename: Shoebox.css
+ * purpose:  main configuration file for ora-wiki
+ * history: 
+ *	swhite	12-feb-2013	created
+ */
+
+/* colors */
+.darkbrown  {color:#663333}
+.red        {color:#8e0707}
+.beige      {color:#cdcb9c}
+.offwhite   {color:#efefef}
+.ltblue2    {color:#c2b8e5}
+.ltblue     {color:#deddc0}
+.darkgreen  {color:#003333}
+.royalbl    {color:#6e07ef}
+.gray2      {color:#deddc0}
+
+/*  general link style  */
+a:link    {color:#000000; text-decoration:none; font-family:Verdana, Arial, Helvetica, sans-serif;}
+a:active  {color:#ffffff; text-decoration:none; font-family:Verdana, Arial, Helvetica, sans-serif;}
+a:hover   {color:#ffffff; text-decoration:none; font-family:Verdana, Arial, Helvetica, sans-serif;}
+a:visited {color:#000000; text-decoration:none; font-family:Verdana, Arial, Helvetica, sans-serif;}
+
+body {
+background: #deddc0;
+color:#6e07ef; 
+font-size:50px; 
+letter-spacing:3px; 
+font-family:bitstream-galaxy,timeburner_regular,Steinerlight,Verdana, Arial, Helvetica, sans-serif;
+}
+
+div#wrapper {
+margin-top: 0px;
+margin-bottom: 20px;
+margin-left: auto;
+margin-right: auto;
+padding: 0px;
+background-color:white; }
+
+div#header {
+margin: 0px 0px 10px 0px;
+padding: 0px 0px 0px 0px;
+width: 100%;
+text-align: left;
+letter-spacing:3px;
+font-size:50px;
+background-color: #FFFFFF;
+border: 0px solid #000000;
+}
+
+div#header table {
+padding: 0px;
+width: 100%;
+border: 0px solid #000000;
+text-align:left;
+}
+
+div#header td {
+text-align: left;
+letter-spacing:3px;
+font-size:50px;
+}
+
+div#nav     {background-color:#6e07ef;
+             margin: 0px;
+             height:30px;
+             width:100%;
+             border: 0px solid #000000;
+             clear:left;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             letter-spacing:3px;
+             color:white; }
+
+div#nav  table {padding:0px;
+             width:100%;
+             border: 0px solid #000000;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             letter-spacing:3px;
+             color:white; }
+
+div#nav  td {padding:0px;
+             width:100%;
+             border: 0px solid #000000;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             letter-spacing:3px;
+             color:white; }
+
+div#nav ul  { margin: 0;
+             cursor: default;
+             list-style-type: none;
+             display: inline;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             letter-spacing:3px;
+             color:white; }
+
+div#nav li  {display: table-cell;
+             position: relative;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             padding: 2px 6px; }
+
+div#nav li.input[type="text"]
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:white;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:10px;
+             background-color:#6e07ef; }
+
+div#nav input[type="submit"]
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:white;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             background-color:#6e07ef; }
+
+div#nav input[type="submit"]:hover
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:orange;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             background-color:#6e07ef; }
+
+div#nav select {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:white;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             background-color:#6e07ef; 
+             }
+
+div#nav select option:hover {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:orange;
+             letter-spacing:3px;
+             font-family:Verdana, Arial, Helvetica, sans-serif;
+             font-size:12px;
+             background-color:#6e07ef; 
+             }
+
+# background-color: #6e07ef;
+# color:#000;
+div#nav_main_wrap {
+position:relative;
+margin-top: 0px;
+margin-bottom: 20px;
+margin-left: auto;
+margin-right: auto;
+padding: 0px;
+background-color:white;
+width:100%;
+clear:left;
+color:#6e07ef;
+}
+
+div#nav_main_wrap table {
+width:100%;
+}
+
+div#nav_main_wrap td {
+text-align:center;
+}
+
+div#main_wrap {
+position:absolute;
+top: 200px;
+left: 100px;
+width:1280px;
+margin:0px;
+padding:0px;
+background-color: #ffffff;
+}
+
+div#main_wrap table { width: 100%; align:center;}
+div#main_wrap td { font-size:14px; }
+
+div#main_wrap input[type="text"]
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:#6e07ef;
+             letter-spacing:3px;
+             font-family:bitstream-galaxy,timeburner_regular,SteinerlightVerdana, Arial, Helvetica, sans-serif;
+             font-size:14px;
+             background-color:#efefef; }
+
+div#main_wrap input[type="submit"]
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:#6e07ef; 
+             letter-spacing:3px; 
+             font-family:bitstream-galaxy,timeburner_regular,SteinerlightVerdana, Arial, Helvetica, sans-serif;
+             font-size:14px;
+             background-color:#efefef; }
+
+div#main_wrap input[type="submit"]:hover
+            {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:#6e07ef;
+             letter-spacing:3px;
+             font-family:bitstream-galaxy,timeburner_regular,SteinerlightVerdana, Arial, Helvetica, sans-serif;
+             font-size:14px;
+             background-color:#efefef; }
+
+div#main_wrap select {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:#6e07ef;
+             letter-spacing:3px;
+             font-family:bitstream-galaxy,timeburner_regular,SteinerlightVerdana, Arial, Helvetica, sans-serif;
+             font-size:14px;
+             background-color:white;
+             }
+
+div#main_wrap select option:hover {display:block;
+             margin:0px;
+             display:inline;
+             border:0px;
+             color:orange;
+             letter-spacing:3px;
+             font-family:bitstream-galaxy,timeburner_regular,SteinerlightVerdana, Arial, Helvetica, sans-serif;
+             font-size:14px;
+             background-color:white;
+             }
+
+.acct1 {text-align:left; width:200px; }
+.acct2 {text-align:center; width:50px;}
+
+div#footer {
+background-color: #FFF;
+width:100%;
+padding: 15px;
+margin: 0px;
+border: 1px solid #000000;
+clear:right;
+}
+
+
+
