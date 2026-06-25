@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="shoeboxai_fonts.css" type="text/css" />
   <link rel="stylesheet" href="print.css" media="print" />
   <title>WikiPay</title>
-<script type="text/javascript" src="Shoebox.js"></script>
+<script type="text/javascript" src="ShoeboxAI.js"></script>
   <script>
      var pfHeaderImgUrl = '';
      var pfHeaderTagline = '';
