@@ -18,20 +18,20 @@ Runs locally under Apache. No build step, no package manager, no test suite — 
 Create the schema by running the build script as a DB admin user:
 
 ```bash
-mysql -u dba -p < build/pay/build.sql
+mysql -u dba -p < build/build.sql
 ```
 
-> **Destructive.** `build/pay/build.sql` drops and recreates the application database. Take a `mysqldump` first if there is existing data you want to keep — see [Backup and restore](#backup-and-restore).
+> **Destructive.** `build/build.sql` drops and recreates the application database. Take a `mysqldump` first if there is existing data you want to keep — see [Backup and restore](#backup-and-restore).
 
-The application connects with the credentials hardcoded in `Shoebox_db.php`:
+The application connects with the credentials hardcoded in `shoeboxai_db.php`:
 
 ```
 host:     localhost
 user:     dba
-database: Shoebox
+database: ShoeboxAI
 ```
 
-Edit `Shoebox_db.php` if your local setup differs. The password is also in that file in plaintext (this is a personal-use app served from `localhost`).
+Edit `shoeboxai_db.php` if your local setup differs. The password is also in that file in plaintext (this is a personal-use app served from `localhost`).
 
 ### 2. Apache
 
@@ -63,7 +63,7 @@ The "which book are we looking at" dropdown is populated from `sched.json` at ru
 }
 ```
 
-The key is the value stored in the DB; the value is the label shown in the UI. No restart needed — `sched.json` is read on every request by `Shoebox_env.php`.
+The key is the value stored in the DB; the value is the label shown in the UI. No restart needed — `sched.json` is read on every request by `shoeboxai_env.php`.
 
 ## Daily use
 
@@ -83,24 +83,23 @@ Forms post back to `index.php` with named buttons; the page re-renders showing t
 | Path | Purpose |
 |---|---|
 | `index.php` | Front controller. Giant `if / elseif` chain on form button names (`v_*` for nav, `f_*` for form actions). |
-| `Shoebox_tools_startup.php` | Bootstrap. Includes the DB, env, and tool modules in order; calls `get_companies()` and `get_accts()` to warm in-memory arrays. |
-| `Shoebox_db.php` | Opens the DB connection (PDO or legacy `mysql_*` depending on `$version`). Credentials hardcoded here. |
-| `Shoebox_env.php` | Declares **all** globals: status/role/app bitmaps, todo type/status enums, form-hint strings, empty arrays the tool modules fill in. Loads `sched.json` into `$schedE_options`. Opens the daily log file (`logs/OraWikiPay_<YYYY-MM-DD>.log`) and the report scratch file (`logs/OraWikiPay_rpt.tmp`). |
-| `Shoebox_tools.php` | Shared helpers: `runsql`, `logger`, `getlastid`, date formatting. |
-| `Shoebox_tools_acct.php` | Chart-of-accounts logic; parent/child tree maintained in `$acct_pid` / `$acct_lvl`. |
-| `Shoebox_tools_comp.php` | Companies (customers + vendors, discriminated by `$ctype_customer` / `$ctype_vendor`). |
-| `Shoebox_tools_inv.php` | Invoices (AR vs AP, discriminated by `$invtype_ar` / `$invtype_ap`). |
-| `Shoebox_tools_rpt.php` | Reports. `rpt_exec(..., 'preview')` writes HTML to screen; `rpt_exec(..., 'exec')` writes to the scratch file and shells out to print. |
+| `shoeboxai_tools_startup.php` | Bootstrap. Includes the DB, env, and tool modules in order; calls `get_companies()` and `get_accts()` to warm in-memory arrays. |
+| `shoeboxai_db.php` | Opens the DB connection (PDO or legacy `mysql_*` depending on `$version`). Credentials hardcoded here. |
+| `shoeboxai_env.php` | Declares **all** globals: status/role/app bitmaps, todo type/status enums, form-hint strings, empty arrays the tool modules fill in. Loads `sched.json` into `$schedE_options`. Opens the daily log file (`logs/OraWikiPay_<YYYY-MM-DD>.log`) and the report scratch file (`logs/OraWikiPay_rpt.tmp`). |
+| `shoeboxai_tools.php` | Shared helpers: `runsql`, `logger`, `getlastid`, date formatting. |
+| `shoeboxai_tools_acct.php` | Chart-of-accounts logic; parent/child tree maintained in `$acct_pid` / `$acct_lvl`. |
+| `shoeboxai_tools_comp.php` | Companies (customers + vendors, discriminated by `$ctype_customer` / `$ctype_vendor`). |
+| `shoeboxai_tools_inv.php` | Invoices (AR vs AP, discriminated by `$invtype_ar` / `$invtype_ap`). |
+| `shoeboxai_tools_rpt.php` | Reports. `rpt_exec(..., 'preview')` writes HTML to screen; `rpt_exec(..., 'exec')` writes to the scratch file and shells out to print. |
 | `sched.json` | Schedule E entity list — populates the entity dropdown. |
-| `Shoebox.css`, `Shoebox_fonts.css` | Screen styles. |
+| `Shoebox.css`, `shoeboxai_fonts.css` | Screen styles. |
 | `print.css` | Print-media override. |
 | `pf.css` | Styles for the bundled PrintFriendly button injected from `index.php`. |
-| `Shoebox.js` | Front-end JS (small). |
-| `build/pay/` | `build.sql` (schema), `functions.sql`, plus a library of ad-hoc report queries (`gl_report.sql`, `rent_*_report.sql`, `invoices_<entity>.sql`, `recurring_*.sql`) run by hand against the live DB. |
+| `ShoeboxAI.js` | Front-end JS (small). |
+| `build/` | `build.sql` (schema), `functions.sql`, plus a library of ad-hoc report queries (`gl_report.sql`, `rent_*_report.sql`, `invoices_<entity>.sql`, `recurring_*.sql`) run by hand against the live DB. |
 | `build/tkt/` | Legacy `Admin` / `Portal` / `ToDo` / `Time` / `Doc` / `Logs` schemas. Not touched by the current `index.php`. |
 | `backup/` | `mysqldump` outputs (`*.dmp`). Not committed casually — these may contain real data. |
 | `cal/` | Vendored third-party PHP-Calendar (GPL). Don't modify unless intentional. See `cal/README`, `cal/INSTALL`. |
-| `pay/` | Stub `index.php` (unused). |
 | `fonts/`, `gif/` | Static assets. |
 | `logs/` | Daily app logs and report scratch file. |
 | `ToDo/` | Author's running design notes — maps roughly onto `index.php` route keys; useful as a feature map. |
@@ -108,7 +107,7 @@ Forms post back to `index.php` with named buttons; the page re-renders showing t
 
 ## Database schema
 
-Six tables in the `Shoebox` database. Source of truth is `build/pay/build.sql`.
+Six tables in the `ShoeboxAI` database. Source of truth is `build/build.sql`.
 
 ```mermaid
 erDiagram
@@ -203,7 +202,7 @@ erDiagram
 - **No foreign-key constraints are declared in the DDL.** The relationships above are enforced by the PHP code, not the database. `inv.acct`, `inv.cid`, `companies.acct`, and `pay.iid` are plain `int`/`varchar` columns — orphan rows are possible.
 - **`acct` is a self-referential tree.** `pid` points at the parent `acct.id`; roots use `pid = 0`. `level` is the tree depth (1..4) and is maintained by the app, not computed.
 - **`pay.iid` is `varchar(8)`** even though `inv.id` is `integer`. The join works because MySQL coerces, but it's a historical quirk — don't model it as a typed FK.
-- **`inv.itype` and `pay.ptype` both use `1=AR, 2=AP`** — mirrored in PHP as `$invtype_ar` / `$invtype_ap` in `Shoebox_env.php`. Keep both sides in sync when adding a type.
+- **`inv.itype` and `pay.ptype` both use `1=AR, 2=AP`** — mirrored in PHP as `$invtype_ar` / `$invtype_ap` in `shoeboxai_env.php`. Keep both sides in sync when adding a type.
 - **`companies.ctype`** uses `0=vendor, 1=customer` — mirrored as `$ctype_vendor` / `$ctype_customer`. A company is one or the other, not both.
 - **`entities.code` is the scope key** referenced everywhere as `$schedE` / `$entity_id` in PHP. The labels shown in the UI come from `sched.json`, not from `entities.name` — the two can drift.
 - **`profile` is a single-row table** describing the app owner. It's not joined to anything; it just feeds the header.
@@ -224,7 +223,7 @@ To add a new feature, add a new `elseif (!empty($_REQUEST['x_yourkey']))` branch
 
 ### Dual driver (mysql vs PDO)
 
-Every data-access function in `Shoebox_tools*.php` branches on `$version`:
+Every data-access function in `shoeboxai_tools*.php` branches on `$version`:
 
 ```php
 if ($version == "5.0") {
@@ -235,7 +234,7 @@ if ($version == "5.0") {
 }
 ```
 
-When adding a query, follow the same shape. The two branches diverge on cursor APIs, so don't try to factor it out — `runsql()` in `Shoebox_tools.php` is the only shared helper.
+When adding a query, follow the same shape. The two branches diverge on cursor APIs, so don't try to factor it out — `runsql()` in `shoeboxai_tools.php` is the only shared helper.
 
 ### SQL is built by string concatenation
 
@@ -249,7 +248,7 @@ Since the app is single-user and runs on localhost, this is acceptable, but **do
 
 ### Adding a status/role/app bitmap or enum value
 
-Status/role/app bitmaps and todo type/status enums are declared as PHP globals in `Shoebox_env.php` **and** mirrored on the SQL side in `build/pay/build.sql`. When adding a new bit or enum value, update both files in the same change.
+Status/role/app bitmaps and todo type/status enums are declared as PHP globals in `shoeboxai_env.php` **and** mirrored on the SQL side in `build/pay/build.sql`. When adding a new bit or enum value, update both files in the same change.
 
 ### Adding a Schedule E entity
 
@@ -262,7 +261,7 @@ Edit `sched.json` — add a `"key": "Label"` entry. The dropdown re-populates on
 ```bash
 ts=$(date +%Y%m%d_%H%M%S)
 mysqldump -u dba -p --single-transaction --routines --triggers \
-  Shoebox > backup/Shoebox_${ts}.dmp
+  ShoeboxAI > backup/shoeboxai_${ts}.dmp
 ```
 
 `--single-transaction` gives a consistent InnoDB snapshot without locking the DB.
@@ -270,23 +269,23 @@ mysqldump -u dba -p --single-transaction --routines --triggers \
 ### Restore from a dump
 
 ```bash
-mysql -u dba -p Shoebox < backup/Shoebox_<timestamp>.dmp
+mysql -u dba -p ShoeboxAI < backup/shoeboxai_<timestamp>.dmp
 ```
 
 ### Full schema rebuild
 
 ```bash
-mysql -u dba -p < build/pay/build.sql
+mysql -u dba -p < build/build.sql
 ```
 
 Destructive — drops and recreates the application database. Always take a backup first.
 
 ## Known quirks
 
-- **`Shoebox_tools_rpt.php_save`** is an intentional backup copy of the reports module. Don't delete it.
+- **`shoeboxai_tools_rpt.php_save`** is an intentional backup copy of the reports module. Don't delete it.
 - **Vim swap files** (`.*.sw[a-p]`, `.*.swo`, `.*.swc`, etc.) clutter the directory from years of editing. Ignore them; don't commit new ones.
-- **The PDO connect string** in `Shoebox_db.php` contains spaces around the `=` signs (`"mysql:host = $db_host ; dbname = $db_name"`). PDO tolerates this but it's non-idiomatic.
-- **`print $version;`** at the top of `Shoebox_tools_startup.php` echoes the driver version into the page output on every request. Cosmetic, not a bug.
+- **The PDO connect string** in `shoeboxai_db.php` contains spaces around the `=` signs (`"mysql:host = $db_host ; dbname = $db_name"`). PDO tolerates this but it's non-idiomatic.
+- **`print $version;`** at the top of `shoeboxai_tools_startup.php` echoes the driver version into the page output on every request. Cosmetic, not a bug.
 - **No authentication.** The app trusts whoever can reach `index.php`. Keep it bound to localhost.
 
 ## License
