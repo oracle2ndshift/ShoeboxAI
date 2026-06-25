@@ -17,8 +17,8 @@
   <meta http-equiv="cache-control" content="no-cache">
   <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
   <link rel="shortcut icon" href="gif/favicon.ico" type=text/css>
-  <link rel="stylesheet" href="Shoebox.css" type="text/css" />
-  <link rel="stylesheet" href="Shoebox_fonts.css" type="text/css" />
+  <link rel="stylesheet" href="ShoeboxAI.css" type="text/css" />
+  <link rel="stylesheet" href="shoeboxai_fonts.css" type="text/css" />
   <link rel="stylesheet" href="print.css" media="print" />
   <title>WikiPay</title>
 <script type="text/javascript" src="Shoebox.js"></script>
@@ -50,10 +50,11 @@
 <body>
 <?php 
   if (!isset($load_once) ) { 
-    include "Shoebox_tools_startup.php";
+    include "shoeboxai_tools_startup.php";
   } 
 ?>
 
+Here is some text.
 <!-- header -->
 <div id="wrapper">
   <form name="HeaderForm" method="post" action="<?php echo($php_self); ?>">
@@ -93,7 +94,7 @@
                  }
               ?>
               <?php
-                // dropdown is populated from sched.json at runtime, via $schedE_options in Shoebox_env.php
+                // dropdown is populated from sched.json at runtime, via $schedE_options in shoeboxai_env.php
                 foreach ($schedE_options as $code => $label) {
                   echo "              <option value='".htmlspecialchars($code)."'>Schedule E: ".htmlspecialchars($label)."</option>\n";
                 }

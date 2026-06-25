@@ -1,0 +1,60 @@
+/* filename  shoeboxai_fonts.css
+ * purpose   store custom font config in 1 place
+ * usage     <link rel="stylesheet" href="shoeboxai_fonts.css" type="text/css" />
+ */
+@font-face { font-family: 'Impregnable'; src:url('fonts/Impregnable.ttf'); }
+@font-face { font-family: 'ConeriaScript'; src:url('fonts/ConeriaScript.ttf'); }
+@font-face { font-family: 'ConeriaScript_Slanted'; src:url('fonts/ConeriaScript_Slanted.ttf'); }
+@font-face { font-family: 'timeburner_regular'; src:url('fonts/timeburner_regular.ttf'); }
+@font-face { font-family: 'Steinerlight'; src:url('fonts/Steinerlight.ttf'); }
+@font-face { font-family: 'bitstream-galaxy'; src:url('fonts/bitstream-galaxy/galaxy-bt.ttf'); }
+
+VeraBd.ttf  VeraBI.ttf  VeraIt.ttf  VeraMoBd.ttf  VeraMoBI.ttf  VeraMoIt.ttf  VeraMono.ttf  VeraSeBd.ttf  VeraSe.ttf  Vera.ttf
+
+@font-face {
+ font-family: 'ProximaLight';
+ src: url('fonts/Proxima-Light/267447_4_0.eot');
+ src: url('fonts/Proxima-Light/267447_4_0.eot?#iefix') format('embedded-opentype'),
+      url('fonts/Proxima-Light/267447_4_0.woff') format('woff'),
+      url('fonts/Proxima-Light/267447_4_0.ttf') format('truetype');
+}
+
+@font-face {
+ font-family: 'ProximaNova';
+ font-weight: bold;
+ src: url('fonts/Proxima-Semibold/267447_5_0.eot');
+ src: url('fonts/Proxima-Semibold/267447_5_0.eot?#iefix') format('embedded-opentype'),
+      url('fonts/Proxima-Semibold/267447_5_0.woff') format('woff'),
+      url('fonts/Proxima-Semibold/267447_5_0.ttf') format('truetype');
+}
+
+@font-face {
+ font-family: 'thirsty_script_lightregular';
+ src: url(fonts/ThirstyScriptLight/ThirstyScriptLight-webfont.eot);
+ src: url(fonts/ThirstyScriptLight/ThirstyScriptLight-webfont.eot?#iefix) format('embedded-opentype'),
+    url(fonts/ThirstyScriptLight/ThirstyScriptLight-webfont.woff) format('woff'),
+    url(fonts/ThirstyScriptLight/ThirstyScriptLight-webfont.ttf) format('truetype'),
+    url(fonts/ThirstyScriptLight/ThirstyScriptLight-webfont.svg?#thirsty_script_lightregular) format('svg');
+ font-weight: normal;
+ font-style: normal;
+}
+
+@font-face {
+ font-family: 'wicons';
+ src: url(fonts/wIcons/wicons.eot);
+ src: url(fonts/wIcons/wicons.eot#iefix) format('embedded-opentype'),
+    url(fonts/wIcons/wicons.woff) format('woff'),
+    url(fonts/wIcons/wicons.ttf) format('truetype'),
+    url(fonts/wIcons/wicons.svg#wicons) format('svg');
+ font-weight: normal;
+ font-style: normal;
+}
+/* Hack to smooth out font rendering on Chrome for Windows */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+ @font-face {
+  font-family: 'wicons';
+  src: url(fonts/wIcons/wicons.svg?#wicons) format('svg');
+ }
+}
+
+@font-face { font-family: 'Antaro'; src:url('fonts/Antaro.ttf'); }
