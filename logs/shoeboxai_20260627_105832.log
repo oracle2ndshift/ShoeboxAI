@@ -1,0 +1,8 @@
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-06-26',2,4.00,302,4.00,1)
+update ShoeboxAI.companies set acct=302 where id=1
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-07-26',2,4.00,302,4.00,1)
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-08-26',2,4.00,302,4.00,1)
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-09-26',2,4.00,302,4.00,1)
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-10-26',2,4.00,302,4.00,1)
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-11-26',2,4.00,302,4.00,1)
+insert into ShoeboxAI.inv (cid,entity_id,idate,itype,amt,acct,balance,recur) values (1,'general','2026-12-26',2,4.00,302,4.00,1)

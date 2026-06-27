@@ -1,0 +1,2 @@
+update ShoeboxAI.inv set balance=balance-4.00 where id=4
+insert into ShoeboxAI.pay (iid,pdate,ptype,amt) values (4,'2026-06-27',2,4.00)
