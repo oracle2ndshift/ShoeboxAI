@@ -14,7 +14,6 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 //print $version;
-include "shoeboxai_db.php";
 include "shoeboxai_env.php";
 include "shoeboxai_tools.php";
 include "shoeboxai_tools_acct.php";

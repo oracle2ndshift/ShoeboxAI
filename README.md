@@ -1,4 +1,4 @@
-# orawiki / WikiPay
+# ShoeboxAI
 
 A single-user PHP + MySQL bookkeeping app. Tracks companies (customers and vendors), accounts (chart of accounts), invoices (A/R and A/P), payments, and reports — scoped per Schedule E entity (rental property, partnership, S-corp, royalty, etc.) for personal tax preparation.
 
@@ -85,7 +85,7 @@ Forms post back to `index.php` with named buttons; the page re-renders showing t
 | `index.php` | Front controller. Giant `if / elseif` chain on form button names (`v_*` for nav, `f_*` for form actions). |
 | `shoeboxai_tools_startup.php` | Bootstrap. Includes the DB, env, and tool modules in order; calls `get_companies()` and `get_accts()` to warm in-memory arrays. |
 | `shoeboxai_db.php` | Opens the DB connection (PDO or legacy `mysql_*` depending on `$version`). Credentials hardcoded here. |
-| `shoeboxai_env.php` | Declares **all** globals: status/role/app bitmaps, todo type/status enums, form-hint strings, empty arrays the tool modules fill in. Loads `sched.json` into `$schedE_options`. Opens the daily log file (`logs/OraWikiPay_<YYYY-MM-DD>.log`) and the report scratch file (`logs/OraWikiPay_rpt.tmp`). |
+| `shoeboxai_env.php` | Declares **all** globals: status/role/app bitmaps, todo type/status enums, form-hint strings, empty arrays the tool modules fill in. Loads `sched.json` into `$schedE_options`. Opens the daily log file (`logs/ShoeboxAIPay_<YYYY-MM-DD>.log`) and the report scratch file (`logs/ShoeboxAIPay_rpt.tmp`). |
 | `shoeboxai_tools.php` | Shared helpers: `runsql`, `logger`, `getlastid`, date formatting. |
 | `shoeboxai_tools_acct.php` | Chart-of-accounts logic; parent/child tree maintained in `$acct_pid` / `$acct_lvl`. |
 | `shoeboxai_tools_comp.php` | Companies (customers + vendors, discriminated by `$ctype_customer` / `$ctype_vendor`). |
@@ -178,7 +178,7 @@ erDiagram
         decimal amt
         int     acct      FK  "acct.id"
         decimal balance
-        int     auto          "auto-pay flag"
+        int     recur         "0=none, 1=mo, 2=wk, 4=daily"
     }
 
     pay {

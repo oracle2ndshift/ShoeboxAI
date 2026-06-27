@@ -9,9 +9,9 @@
 // function get_open_invoices()
 //   
 function get_open_invoices($itype,$schedE) {
-  global $version,$pdo,$inv_cid,$inv_idate,$inv_itype,$inv_amt,$inv_acct,$inv_balance,$inv_auto,$invtype_ap,$invtype_ar,$php_self,$today;
+  global $version,$pdo,$inv_cid,$inv_idate,$inv_itype,$inv_amt,$inv_acct,$inv_balance,$inv_recur,$invtype_ap,$invtype_ar,$php_self,$today;
 
-  $sql  = "select i.id id,i.cid cid,c.name name,i.idate idate,i.itype itype,i.amt amt,i.acct acct,i.balance balance,i.auto auto ";
+  $sql  = "select i.id id,i.cid cid,c.name name,i.idate idate,i.itype itype,i.amt amt,i.acct acct,i.balance balance,i.recur recur ";
   $sql .= " from ShoeboxAI.inv i, ShoeboxAI.companies c ";
   $sql .= " where balance!=0 and idate <= curdate() ";
   $sql .= " and c.id=i.cid ";
@@ -19,11 +19,11 @@ function get_open_invoices($itype,$schedE) {
   $sql .= " and entity_id='".$schedE."' ";
   $sql .= " order by cid,idate";
 
-  $buildpage  = "<tr><td>Id</td><td>Company</td><td>Date</td><td>Type</td><td>Amount</td><td>Acct</td><td>Balance</td><td>Recurr</td></tr>";
+  $buildpage  = "<tr><td>Id</td><td>Company</td><td>Date</td><td>Type</td><td>Amount</td><td>Acct</td><td>Balance</td><td>Recur</td></tr>";
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
-    while($row = mysql_fetch_array($result)) {
+    while($row = run_fetch($version,$result)) {
       $id      = $row['id'];
       $cid     = $row['cid'];
       $name    = $row['name'];
@@ -32,7 +32,7 @@ function get_open_invoices($itype,$schedE) {
       $amt     = $row['amt'];
       $acct    = $row['acct'];
       $balance = $row['balance'];
-      $auto    = $row['auto'];
+      $recur   = $row['recur'];
       $buildpage .= "<tr><form name='EditInv_".$id."' method='post' action='".$php_self."'>";
       $buildpage .= "<td><input type=hidden value='".$id."' name='f_inv_id'>".$id."</td>";
       $buildpage .= "<td>".$name."</td>";
@@ -41,7 +41,7 @@ function get_open_invoices($itype,$schedE) {
       $buildpage .= "<td>".$amt."</td>";
       $buildpage .= "<td>".$acct."</td>";
       $buildpage .= "<td>".$balance."</td>";
-      $buildpage .= "<td>".$auto."<input type=hidden value='".$auto."' name='f_inv_auto'></td>";
+      $buildpage .= "<td>".recur_label($recur)."</td>";
       $buildpage .= "<td><input size=5 type=submit value='Edit' name='f_inv_upd'></td>\n";
       $buildpage .= "<td><input size=5 type=submit value='Delete' name='f_inv_del'></td></form></tr>\n";
     }
@@ -56,7 +56,7 @@ function get_open_invoices($itype,$schedE) {
       $amt     = $row['amt'];
       $acct    = $row['acct'];
       $balance = $row['balance'];
-      $auto    = $row['auto'];
+      $recur   = $row['recur'];
       $buildpage .= "<tr><form name='EditInv_".$id."' method='post' action='".$php_self."'>";
       $buildpage .= "<td><input type=hidden value='".$id."' name='f_inv_id'>".$id."</td>";
       $buildpage .= "<td>".$name."</td>";
@@ -65,8 +65,7 @@ function get_open_invoices($itype,$schedE) {
       $buildpage .= "<td>".$amt."</td>";
       $buildpage .= "<td>".$acct."</td>";
       $buildpage .= "<td>".$balance."</td>";
-      $buildpage .= "<td><input type=readonly value='".$auto."' name='f_inv_auto'></td>";
-      $buildpage .= "<td>".$auto."</td>";
+      $buildpage .= "<td>".recur_label($recur)."</td>";
       $buildpage .= "<td><input size=5 type=submit value='Edit' name='f_inv_upd'></td>\n";
       $buildpage .= "<td><input size=5 type=submit value='Delete' name='f_inv_del'></td></form></tr>\n";
     }
@@ -79,7 +78,7 @@ function get_open_invoices($itype,$schedE) {
 // function get_open_invpay()
 //   
 function get_open_invpay($itype,$schedE) {
-  global $version,$pdo,$invtype_ap,$invtype_ar,$php_self,$today;
+  global $version,$pdo,$invtype_ap,$invtype_ar,$php_self,$today,$dp;
   
   $i = 0;
 
@@ -99,9 +98,9 @@ function get_open_invpay($itype,$schedE) {
   $buildpage .= "<th>Id</th><th>Company</th><th>Date</th><th>Paid Date</th><th>Type</th><th>Amount</th><th>Balance</th><th>".$paytype."</th></tr>";
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
-    while($row = mysql_fetch_array($result)) {
+    while($row = run_fetch($version,$result)) {
       $i            = $i + 1;
       $id           = $row['id'];
       $cid          = $row['cid'];
@@ -193,8 +192,8 @@ function mk_acct_options() {
   $options = "<option value='0'>--None--</option>\n";
   foreach ($acct_name as $id => $name) {
     $name = str_pad($name,strlen($name)+($acct_lvl[$id]-1)*2," ",STR_PAD_LEFT);
-    if ($acct_pname != "") { $pname = " - ".$acct_pname.")";}
-    else                   { $pname = ")"; } 
+    // if ($acct_pname != "") { $pname = " - ".$acct_pname.")";}
+    // else                   { $pname = ")"; } 
     $options .= "<option value='".$id."'>".$name." (".$id.")</option>\n";
   }
   return $options;
@@ -214,7 +213,7 @@ function build_addinv_page($invtype) {
   $buildpage .= "</td></tr>\n";
   if ($invtype == $invtype_ar) {$itype = 'AR';} else {$itype = 'AP';}
   $buildpage .= "<tr><td class=label>Type</td><td><input type=hidden name=f_inv_itype id=f_inv_itype value=$invtype>".$itype."</td></tr>\n";
-  $buildpage .= "<tr><td class=label>Auto</td><td><input name='f_inv_auto' size=3 value='0'></td></tr>\n";
+  $buildpage .= "<tr><td class=label>Recur</td><td><select name='f_inv_recur'>".recur_options(0)."</select></td></tr>\n";
   $buildpage .= "<tr><td class=label>Entity</td><td><input readonly type=text name='f_inv_entity_id' value='".$schedE."'></td></tr>\n";
   $buildpage .= "<tr><td colspan=2><input type=submit name='f_inv_ins' value='Insert'></td></tr>\n";
   echo $buildpage;
@@ -224,41 +223,29 @@ function build_addinv_page($invtype) {
 // function build_updinv_page() {
 //
 function build_updinv_page($id) {
-  global $invtype_ap,$invtype_ar,$php_self,$pdo,$version;
+  global $invtype_ap,$invtype_ar,$php_self,$pdo,$version,$dp;
  
-  $sql  = "select id,cid,idate,itype,amt,acct,balance,auto ";
+  $sql  = "select id,cid,idate,itype,amt,acct,balance,recur ";
   $sql .= " from ShoeboxAI.inv i ";
   $sql .= " where id=".$id;
 
-  if ($version == "5.0") {
-    $result = mysql_query($sql);
-    if (!$result) { die("Failed query:  sql=$sql"); }
-    $row = mysql_fetch_array($result);
-    $id      = $row['id'];
-    $cid     = $row['cid'];
-    $idate   = $row['idate'];
-    $itype   = $row['itype'];
-    $amt     = $row['amt'];
-    $acct    = $row['acct'];
-    $balance = $row['balance'];
-    $auto    = $row['auto'];
-  }
-  else {
-    foreach ($pdo->query($sql) as $row) {
-    $id      = $row['id'];
-    $cid     = $row['cid'];
-    $idate   = $row['idate'];
-    $itype   = $row['itype'];
-    $amt     = $row['amt'];
-    $acct    = $row['acct'];
-    $balance = $row['balance'];
-    $auto    = $row['auto'];
-    }
-  }
+  $result = run_query($version,$dp,$sql);
+  if (!$result) { die("Failed query:  sql=$sql"); }
+  $row = run_fetch($version,$result);
+  $id      = $row['id'];
+  $cid     = $row['cid'];
+  $idate   = $row['idate'];
+  $itype   = $row['itype'];
+  if ($itype == 1) {$invtype=$invtype_ar;} else {$invtype=$invtype_ap;}
+  $amt     = $row['amt'];
+  $acct    = $row['acct'];
+  $balance = $row['balance'];
+  $recur   = $row['recur'];
+
   $buildpage  = "<form name='UpdInv' method='post' action='".$php_self."'>";
   $buildpage  = "<tr><td class=label>Id</td><td><input size=8 readonly type=text name='f_inv_id' value='".$id."'></td></tr>\n";
   $buildpage .= "<tr><td class=label>Comp Id</td><td><select name='f_inv_cid' id='f_inv_cid'><option value='".$cid."'>".$cid."</option>";
-  $buildpage .= mk_id_options();
+  $buildpage .= mk_id_options($invtype);
   $buildpage .= "</td></tr>\n";
   $buildpage .= "<tr><td class=label>Date</td><td><input  size=30 type=date name='f_inv_idate' value='".$idate."'></td></tr>\n";
   $buildpage .= "<tr><td class=label>Amt</td><td><input  size=30 type=decimal name='f_inv_amt' value='".$amt."'></td></tr>\n";
@@ -270,37 +257,37 @@ function build_updinv_page($id) {
   $buildpage .= "  <option value='".$itype."'>".$itype."</option>";
   $buildpage .= "  <option value='".$invtype_ap."'>AP</option>";
   $buildpage .= "  <option value='".$invtype_ar."'>AR</option>";
-  $buildpage .= "<tr><td class=label>Auto</td><td><input  size=3 type=text name='f_inv_auto' value='".$auto."'></td></tr>\n";
+  $buildpage .= "</select></td></tr>\n";
+  $buildpage .= "<tr><td class=label>Recur</td><td><select name='f_inv_recur'>".recur_options($recur)."</select></td></tr>\n";
   $buildpage .= "<tr><td colspan=2><input type=submit name='f_inv_updsubmit' value='Submit'></td></tr></form>\n";
   echo $buildpage;
 }
 
 //
-// function upd_inv() {
+// function upd_inv()
 //
-function updinv($id,$entity_id,$cid,$idate,$itype,$amt,$acct,$balance,$auto) {
-  if ($auto != 'Y' ) {
-    $sql  = "update ShoeboxAI.inv set ";
-    $sql .= " cid='".$cid."',";
-    $sql .= " entity_id='".$entity_id."',";
-    $sql .= " idate='".$idate."',"; 
-    $sql .= " itype=".$itype.","; 
-    $sql .= " amt=".$amt.","; 
-    $sql .= " acct='".$acct."',"; 
-    $sql .= " balance=".$balance.","; 
-    $sql .= " auto=".$auto." where id='".$id."'";
-  }
+function updinv($id,$entity_id,$cid,$idate,$itype,$amt,$acct,$balance,$recur) {
+  $sql  = "update ShoeboxAI.inv set ";
+  $sql .= " cid='".$cid."',";
+  $sql .= " entity_id='".$entity_id."',";
+  $sql .= " idate='".$idate."',";
+  $sql .= " itype=".$itype.",";
+  $sql .= " amt=".$amt.",";
+  $sql .= " acct='".$acct."',";
+  $sql .= " balance=".$balance.",";
+  $sql .= " recur=".intval($recur)." where id='".$id."'";
   runsql($sql);
 }
 
 //
-// function ins_inv() 
+// function ins_inv()
 //
-function insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$auto) {
+function insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$recur) {
   global $pdo,$version,$php_self;
+  $recur = intval($recur);
 
   $sql  = "insert into ShoeboxAI.inv ";
-  $sql .= "(cid,entity_id,idate,itype,amt,acct,balance,auto) values (";
+  $sql .= "(cid,entity_id,idate,itype,amt,acct,balance,recur) values (";
   $sql .= $cid.",";
   $sql .= "'".$entity_id."',";
   $sql .= "'".$idate."',";
@@ -308,29 +295,38 @@ function insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$auto) {
   $sql .= $amt.",";
   $sql .= $acct.",";
   $sql .= $amt.",";
-  $sql .= $auto.")";
+  $sql .= $recur.")";
   runsql($sql);
 
   $sql  = "update ShoeboxAI.companies set acct=".$acct." where id=".$cid;
   runsql($sql);
 
   //
-  // insert recurring invoices
+  // recurring invoices: generate child rows through end of the parent's year.
+  // recur values: 1=monthly, 2=weekly, 4=daily (matches $invrecur_*).
   //
-  if ($auto != 0 ) {
-    for ($i = get_month($idate)+1; $i <= $auto; $i++) {
-  
-      $sql  = "insert into ShoeboxAI.inv ";
-      $sql .= "(cid,entity_id,idate,itype,amt,acct,balance,auto) values (";
-      $sql .= $cid.",";
-      $sql .= "'".$entity_id."',";
-      $sql .= "'".$idate."',";
-      $sql .= $itype.",";
-      $sql .= $amt.",";
-      $sql .= $acct.",";
-      $sql .= $amt.",";
-      $sql .= $auto.")";
-      runsql($sql);
+  if ($recur != 0) {
+    $interval = recur_interval($recur);
+    if ($interval !== null) {
+      $start = new DateTime($idate);
+      $year  = $start->format('Y');
+      $next  = clone $start;
+      $next->add($interval);
+      while ($next->format('Y') == $year) {
+        $next_idate = $next->format('Y-m-d');
+        $sql  = "insert into ShoeboxAI.inv ";
+        $sql .= "(cid,entity_id,idate,itype,amt,acct,balance,recur) values (";
+        $sql .= $cid.",";
+        $sql .= "'".$entity_id."',";
+        $sql .= "'".$next_idate."',";
+        $sql .= $itype.",";
+        $sql .= $amt.",";
+        $sql .= $acct.",";
+        $sql .= $amt.",";
+        $sql .= $recur.")";
+        runsql($sql);
+        $next->add($interval);
+      }
     }
   }
 }
@@ -338,8 +334,39 @@ function insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$auto) {
 //
 // function del_inv() {
 //
-function delinv($id) { 
+function delinv($id) {
   runsql("delete from ShoeboxAI.inv where id='".$id."'");
+}
+
+//
+// Recur helpers — values mirror $invrecur_mon (1), $invrecur_week (2), $invrecur_daily (4).
+//
+function recur_label($recur) {
+  switch (intval($recur)) {
+    case 1: return 'Monthly';
+    case 2: return 'Weekly';
+    case 4: return 'Daily';
+    default: return 'None';
+  }
+}
+
+function recur_options($selected) {
+  $selected = intval($selected);
+  $out = '';
+  foreach (array(0 => 'None', 1 => 'Monthly', 2 => 'Weekly', 4 => 'Daily') as $v => $label) {
+    $sel = ($v === $selected) ? ' selected' : '';
+    $out .= "<option value='".$v."'".$sel.">".$label."</option>";
+  }
+  return $out;
+}
+
+function recur_interval($recur) {
+  switch (intval($recur)) {
+    case 1: return new DateInterval('P1M');
+    case 2: return new DateInterval('P1W');
+    case 4: return new DateInterval('P1D');
+    default: return null;
+  }
 }
 
 ?>

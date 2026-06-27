@@ -9,7 +9,7 @@
 // function get_rpt_page()
 //
 function get_rpt_page($schedE) {
-  global $pdo,$version,$php_self,$ctype_vendor,$ctype_customer,$comp_name,$comp_ctype,$report_list;
+  global $pdo,$version,$php_self,$ctype_vendor,$ctype_customer,$comp_name,$comp_ctype,$report_list,$dp;
 
   $bdate = date("Y-1-1");
   $edate = date("Y-12-31");
@@ -232,7 +232,7 @@ function rpt_print() {
 // function rpt_exec($schedE,$bdate,$edate,$vendor,$customer,$rtype,$exec_preview)
 //
 function rpt_exec($schedE,$bdate,$edate,$vendor,$customer,$rtype,$exec_preview) {
-  global $pdo,$version,$php_self,$ctype_vendor,$ctype_customer,$comp_name,$comp_ctype,$report_list,$rpttitle,$rptcols,$rptcollen,$rptpreview,$rptfp,$rptpage,$rptlineitems;
+  global $pdo,$version,$php_self,$ctype_vendor,$ctype_customer,$comp_name,$comp_ctype,$report_list,$rpttitle,$rptcols,$rptcollen,$rptpreview,$rptfp,$rptpage,$rptlineitems,$dp;
 
   //
   // initialize formatting arrays
@@ -282,9 +282,9 @@ function rpt_exec($schedE,$bdate,$edate,$vendor,$customer,$rtype,$exec_preview) 
     $sql .= "from ShoeboxAI.companies where 1=1 ".$where." order by 2";
 
     if ($version == "5.0") {
-      $result = mysql_query($sql);
+      $result = run_query($version,$dp,$sql);
       if (!$result) { die("Failed query:  sql=$sql"); }
-      while($row = mysql_fetch_array($result)) {
+      while($row = run_fetch($version,$result)) {
         $rptlineitems[1] = $row['id'];
         $rptlineitems[2] = $row['name'];
         $rptlineitems[3] = $row['ctype'];
@@ -355,9 +355,9 @@ function rpt_exec($schedE,$bdate,$edate,$vendor,$customer,$rtype,$exec_preview) 
     $sql .= " where ".$where." order by 2,3";
 
     if ($version == "5.0") {
-      $result = mysql_query($sql);
+      $result = run_query($version,$dp,$sql);
       if (!$result) { die("Failed query:  sql=$sql"); }
-      while($row = mysql_fetch_array($result)) {
+      while($row = run_fetch($version,$result)) {
         $rptlineitems[1] = $row['id'];
         $rptlineitems[2] = $row['cid'];
         $rptlineitems[3] = $row['idate'];
@@ -423,9 +423,9 @@ function rpt_exec($schedE,$bdate,$edate,$vendor,$customer,$rtype,$exec_preview) 
     $sql .= " order by a.id";
 
     if ($version == "5.0") {
-      $result = mysql_query($sql);
+      $result = run_query($version,$dp,$sql);
       if (!$result) { die("Failed query:  sql=$sql"); }
-      while($row = mysql_fetch_array($result)) {
+      while($row = run_fetch($verson,$result)) {
         $acct  = $row['acct'];
         $type  = $row['type'];
         $name  = $row['name'];

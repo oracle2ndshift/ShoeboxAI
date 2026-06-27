@@ -22,7 +22,7 @@ function mk_acct_array($id,$name,$atype,$pname,$pid,$level) {
 // function get_accts()
 //
 function get_accts() {
-  global $version,$buildpage,$acct_name,$acct_type,$php_self,$pdo;
+  global $version,$buildpage,$acct_name,$acct_type,$php_self,$pdo,$dp;
   $acct_name = array();
   $acct_type = array();
 
@@ -32,7 +32,7 @@ function get_accts() {
   $sql .= " order by 1";
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
     while($row = mysql_fetch_array($result)) {
       $id      = $row['id'];
@@ -59,12 +59,12 @@ function get_accts() {
 // function add_acct()
 //
 function add_acct($id,$name,$atype) {
-  global $acct_name,$acct_type,$php_self,$pdo,$version;
+  global $acct_name,$acct_type,$php_self,$pdo,$version,$dp;
   $sql  = "insert into ShoeboxAI.acct (id,name,atype) values ";
   $sql .= "('".$id."','".$name."','".$atype."')";
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
   } else {
     if (!($pdo->exec($sql) > 0)) { echo("Failed query:  sql=$sql"); }
@@ -74,14 +74,14 @@ function add_acct($id,$name,$atype) {
 // function upd_acct()
 //
 function upd_acct($id,$name,$atype,$pid) {
-  global $acct_name,$acct_type,$php_self,$pdo,$version;
+  global $acct_name,$acct_type,$php_self,$pdo,$version,$dp;
   $sql  = "update from ShoeboxAI.acct ";
   $sql .= "name = '".$name."', ";
   $sql .= "atype = '".$atype."', ";
   $sql .= "pid = ".$pid." where id=".$id;
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
   } else {
     if (!($pdo->exec($sql) > 0)) { echo("Failed query:  sql=$sql"); }
@@ -91,10 +91,10 @@ function upd_acct($id,$name,$atype,$pid) {
 // function del_acct()
 // 
 function del_acct($id) {
-  global $acct_name,$acct_type,$php_self,$pdo,$version;
+  global $acct_name,$acct_type,$php_self,$pdo,$version,$dp;
   $sql  = "delete from ShoeboxAI.acct where id=".$id;
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
   } else {
     if (!($pdo->exec($sql) > 0)) { echo("Failed query:  sql=$sql"); }
@@ -104,7 +104,7 @@ function del_acct($id) {
 // function get_accts_page()
 // 
 function get_accts_page() {
-  global $buildpage,$acct_name,$acct_type,$acct_lvl,$php_self;
+  global $buildpage,$acct_name,$acct_type,$acct_lvl,$php_self,$acct_pid;
 
   $buildpage  = "<tr><td class='acct2'>Id</td><td>Name</td><td class='acct2'>Type</td><td></td></tr>\n";
   

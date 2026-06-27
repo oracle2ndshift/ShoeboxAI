@@ -52,13 +52,13 @@ function mk_comp_array($id,$name,$addr1,$addr2,$addr3,$phone1,$phone2,$fax,$ctyp
 // function get_companies()
 //
 function get_companies() {
-  global $version,$comp_id,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$ctype_vendor,$ctype_customer,$php_self,$pdo;
+  global $version,$comp_id,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$ctype_vendor,$ctype_customer,$php_self,$pdo,$dp;
 
   $sql  = "select id,name,addr1,addr2,addr3,phone1,phone2,fax,notes,ctype,active,acct";
   $sql .= " from ShoeboxAI.companies where active=1 order by name";
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
     while($row = mysql_fetch_array($result)) {
       $id      = $row['id'];
@@ -98,12 +98,12 @@ function get_companies() {
 // function get_1_company()
 //
 function get_1_company($id) {
-  global $version,$comp_id,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$php_self,$pdo;
+  global $version,$comp_id,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$php_self,$pdo,$dp;
   $sql  = "select name,addr1,addr2,addr3,phone1,phone2,fax,notes,ctype,acct ";
   $sql .= " from ShoeboxAI.companies where id=".$id;
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
     while($row = mysql_fetch_array($result)) {
       return $row;
@@ -137,7 +137,7 @@ function upd_comp($id,$name,$addr1,$addr2,$addr3,$phone1,$phone2,$fax,$ctype,$no
 // function del_comp()
 //
 function del_comp($id) {
-  global $version,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$inv_cid,$pdo;
+  global $version,$comp_name,$comp_addr1,$comp_addr2,$comp_addr3,$comp_phone1,$comp_phone2,$comp_fax,$comp_notes,$comp_ctype,$comp_active,$inv_cid,$pdo,$comp_acct;
   if (array_key_exists($id,$inv_cid)) {
     $sql = "update ShoeboxAI.companies set active=0 where id=".$id;
     $comp_active[$id] = 0;

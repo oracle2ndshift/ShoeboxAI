@@ -11,14 +11,13 @@
 // function get_profile()
 //
 function get_profile() {
-  global $pdo,$version;
+  global $pdo,$version,$dp;
   $sql  = "select name,website,addr1,addr2,addr3,phone,fax,notes";
   $sql .= " from ShoeboxAI.profile ";
 
-  if ($version == "5.0") {
-    $result = mysql_query($sql);
-    if (!$result) { die("Failed query:  sql=$sql"); }
-    while($row = mysql_fetch_array($result)) {
+  $result = run_query($version,$dp,$sql);
+  if (!$result) { die("Failed query:  sql=$sql"); }
+  while($row = run_fetch($version,$result)) {
       $name    = $row['name'];
       $website = $row['website'];
       $addr1   = $row['addr1'];
@@ -27,18 +26,6 @@ function get_profile() {
       $phone   = $row['phone'];
       $fax     = $row['fax'];
       $notes   = $row['notes'];
-    }
-  } else {
-    foreach ($pdo->query($sql) as $row) {
-      $name    = $row['name'];
-      $website = $row['website'];
-      $addr1   = $row['addr1'];
-      $addr2   = $row['addr2'];
-      $addr3   = $row['addr3'];
-      $phone   = $row['phone'];
-      $fax     = $row['fax'];
-      $notes   = $row['notes'];
-    }
   }
   $page  = "<tr><td class='label'>Name</td> <td><input type=text value='".$name."'  name='f_profile_name'  id='f_profile_name'></td></tr>\n";
   $page .= "<tr><td class='label'>Addr</td> <td><input type=text value='".$addr1."' name='f_profile_addr1' id='f_profile_addr1'></td></tr>\n";
@@ -54,7 +41,7 @@ function get_profile() {
 // function upd_profile()
 //
 function upd_profile($name,$website,$addr1,$addr2,$addr3,$phone,$fax,$notes) {
-  global $pdo,$version;
+  global $pdo,$version,$dp;
   $sql  = "update ShoeboxAI.profile ";
   $sql .= "set name='".$name."'";
   $sql .= ",website='".$website."'";
@@ -66,7 +53,7 @@ function upd_profile($name,$website,$addr1,$addr2,$addr3,$phone,$fax,$notes) {
   $sql .= ",notes='".$notes."'";
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
   } else {
       if (!($pdo->exec($sql) > 0)) { echo("Failed query:  sql=$sql"); }
@@ -78,10 +65,10 @@ function upd_profile($name,$website,$addr1,$addr2,$addr3,$phone,$fax,$notes) {
 // function runsql($sql) {
 //
 function runsql($sql) {
-  global $pdo,$version;
+  global $pdo,$version,$dp;
 
   if ($version == "5.0") {
-    $result = mysql_query($sql);
+    $result = run_query($version,$dp,$sql);
     if (!$result) { die("Failed query:  sql=$sql"); }
   }
   else {
@@ -94,13 +81,13 @@ function runsql($sql) {
 // function getlastid() 
 //
 function getlastid() {
-  global $pdo,$version;
+  global $pdo,$version,$dp;
   $id = -1;
   $sql = "select max(id) id from ShoeboxAI.companies";
   if ($version == "5.0") { 
-      $result = mysql_query($sql);
+      $result = run_query($version,$dp,$sql);
       if (!$result) { die("Failed query:  sql=$sql"); } 
-      while($row = mysql_fetch_array($result)) { $id = $row['id']; } 
+      while($row = run_fetch($version,$result)) { $id = $row['id']; } 
   } else { 
       if (!($pdo->exec($sql) > 0)) { echo("Failed query:  sql=$sql"); } 
       foreach ($pdo->query($sql) as $row) { $id = $row['id']; } 
@@ -127,5 +114,30 @@ function get_day($thedate) {
 function get_month($thedate) {
   return date("d",strtotime($thedate));
 }
+
+// mysql version differences
+function run_query($version,$dp,$sql) {
+    if ($version == "5") {
+       $result = mysql_query($sql);
+    } else {
+       $result = mysqli_query($dp,$sql);
+    }
+    return $result;
+  }
+function run_fetch($version,$result) {
+    if ($version == "5") {
+       $row = mysql_fetch_array($result);
+    } else {
+       $row = mysqli_fetch_array($result);
+    }
+    return $row;
+  }
+function run_free($version,$result) {
+    if ($version == "5") {
+       mysql_free_result($result);
+    } else {
+       mysqli_free_result($result);
+    }
+  }
 
 ?>

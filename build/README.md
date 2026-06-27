@@ -140,7 +140,7 @@ Seed `code`s: `Rental1`, `Rental2`, `Rental3`, `Royalty`, `Partnership1`,
 | `amt`       | decimal(9,2)   | invoice amount                                     |
 | `acct`      | int            | chart-of-accounts node (`acct.id`)                 |
 | `balance`   | decimal(9,2)   | remaining amount owed; `0` once fully paid         |
-| `auto`      | int(1)         | autopay flag (primarily for AP)                    |
+| `recur`     | int            | recurrence: `0` none, `1` monthly, `2` weekly, `4` daily (mirrors `@invrecur_*`). When non-zero, `insinv()` auto-generates child invoices for every period through the end of the parent's year. |
 
 Indexes:
 
@@ -240,9 +240,9 @@ adding a bit or enum value.
 | `@ctype_customer`    | `1`   | `companies.ctype`  | `$ctype_customer`       |
 | `@invtype_ar`        | `1`   | `inv.itype`        | `$invtype_ar`           |
 | `@invtype_ap`        | `2`   | `inv.itype`        | `$invtype_ap`           |
-| `@invrecur_mon`      | `1`   | invoice cycle      | (not yet used in PHP)   |
-| `@invrecur_week`     | `2`   | invoice cycle      | (not yet used in PHP)   |
-| `@invrecur_daily`    | `4`   | invoice cycle      | (not yet used in PHP)   |
+| `@invrecur_mon`      | `1`   | `inv.recur`        | `$invrecur_mon`         |
+| `@invrecur_week`     | `2`   | `inv.recur`        | `$invrecur_week`        |
+| `@invrecur_daily`    | `4`   | `inv.recur`        | `$invrecur_daily`       |
 
 The 24-slot bitmap block at the top of `build.sql` is a reserved scratch for
 status/role/app flags — most slots are still `Unused`.

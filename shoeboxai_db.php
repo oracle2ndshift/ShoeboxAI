@@ -11,15 +11,29 @@
   $db_user = 'dba';
   $db_pwd  = 'ground0';
   $db_name = 'ShoeboxAI';
-  $version = '8.0';
+  // $version = '8.0';
 //
-// connection: v5.0 or 5.2 or 8.0
+// connection: v5 or 8
 //
-  if ($version == "5.0") {
+    if (function_exists('mysql_query')) {
     if (!mysql_connect($db_host, $db_user, $db_pwd)) die("Can't connect to $db_name") ;
     if (!mysql_select_db($db_name)) die("Can't select $db_name") ;
+    $version = mysql_query('SELECT VERSION()')->fetchColumn();
   } else {
-    $pdo = new PDO ("mysql:host = $db_host ; dbname = $db_name", $db_user, $db_pwd) or die ("Error");
+    $options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false // Set to true or false
+];
+    $pdo = new PDO ("mysql:host = $db_host ; dbname = $db_name", $db_user, $db_pwd, $options) or die ("Error");
+    $mysqli = new mysqli("localhost", $db_user, $db_pwd, $db_name);
+    $dp = mysqli_connect("localhost", $db_user, $db_pwd, $db_name);
+    $version = $pdo->query('SELECT VERSION()')->fetchColumn();
   }
+
+  return [
+    'version' => $version[0],
+    'dp'      => $dp
+];
+
 ?>
 

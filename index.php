@@ -6,7 +6,7 @@
 *
 * Filename     - index.html
 * 
-* Purpose      - WikiPay
+* Purpose      - ShoeboxAI
 *
 * Flow         - Top level script
 *
@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="ShoeboxAI.css" type="text/css" />
   <link rel="stylesheet" href="shoeboxai_fonts.css" type="text/css" />
   <link rel="stylesheet" href="print.css" media="print" />
-  <title>WikiPay</title>
+  <title>ShoeboxAI</title>
 <script type="text/javascript" src="ShoeboxAI.js"></script>
   <script>
      var pfHeaderImgUrl = '';
@@ -50,18 +50,20 @@
 <body>
 <?php 
   if (!isset($load_once) ) { 
+    $config = include "shoeboxai_db.php";
+    $version = $config['version'];
+    $dp      = $config['dp'];
     include "shoeboxai_tools_startup.php";
   } 
 ?>
 
-Here is some text.
 <!-- header -->
 <div id="wrapper">
   <form name="HeaderForm" method="post" action="<?php echo($php_self); ?>">
 <div id="header">
   <table>
-    <tr><td align=left><img src="gif/icon.jpg"><img src="gif/logo.jpg"></td>
-        <td>Wiki-pay</td></tr>
+    <tr><td align=left><img src="gif/icon.jpg"></td>
+        <td>ShoeboxAI</td></tr>
   </table>
 </div>
 <div id="nav">
@@ -148,9 +150,9 @@ Here is some text.
   $itype     = $_REQUEST['f_inv_itype'];
   $amt       = $_REQUEST['f_inv_amt'];
   $acct      = $_REQUEST['f_inv_acct'];
-  $auto      = $_REQUEST['f_inv_auto'];
+  $recur     = $_REQUEST['f_inv_recur'];
 
-  insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$auto);
+  insinv($entity_id,$cid,$idate,$itype,$amt,$acct,$recur);
 ?>
 
 <!---  invoices delete --------------------------------------------------  --->
@@ -175,9 +177,9 @@ Here is some text.
   $amt       = $_REQUEST['f_inv_amt'];
   $acct      = $_REQUEST['f_inv_acct'];
   $balance   = $_REQUEST['f_inv_balance'];
-  $auto      = $_REQUEST['f_inv_auto'];
+  $recur     = $_REQUEST['f_inv_recur'];
 
-  updinv($id,$entity_id,$cid,$idate,$itype,$amt,$acct,$balance,$auto);
+  updinv($id,$entity_id,$cid,$idate,$itype,$amt,$acct,$balance,$recur);
 ?>
 <!---  invoices ap pay ------------------------------------------------  --->
 <?php

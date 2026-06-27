@@ -14,7 +14,7 @@ $load_once  = 1;
 $self       = "SWhite";
 $php_self   = $_SERVER['PHP_SELF'];
 date_default_timezone_set('America/Los_Angeles');
-$today      = date("Y-m-d");
+$today      = date("Ymd_His");
 //
 // sql constants
 //
@@ -56,10 +56,10 @@ $inv_itype   = array();
 $inv_amt     = array();
 $inv_acct    = array();
 $inv_balance = array();
-$inv_auto    = array();
+$inv_recur   = array();
 // logging
 $logfile     = "logs/shoeboxai_".$today.".log";
-$fp = fopen($logfile,'a');
+$fp          = fopen($logfile,'a');
 // reporting
 $report_list = array();
 $report_list[1] = "Profit and Loss";
@@ -73,7 +73,7 @@ $rptcollen      = array();
 $rptpreview     = "";
 $rptlineitems   = array();
 $rptfile        = "logs/shoeboxai_rpt.tmp";
-$rptfp          = fopen($rptfile,'w');
+$rptfp          = "";
 $rptpage        = "";
 $rpt_pandl_name = array();
 $rpt_pandl_lvl  = array();

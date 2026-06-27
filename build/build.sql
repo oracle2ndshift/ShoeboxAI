@@ -1,5 +1,5 @@
 -- filename build.sql
--- purpose  schema objects for accounting software
+-- purpose  schema objects for ShoeboxAI
 -- usage
 -- bitmaps:  
 --  (1,'Unused');
@@ -74,16 +74,17 @@ create table ShoeboxAI.profile (
   primary key (id)
 ) engine=InnoDB default charset=latin1 comment 'Who Am I';
 
+-- Change this to be your profile, default login user=dba
 insert into ShoeboxAI.profile (login,passwd,name,website,addr1,addr2,addr3,phone,fax,notes) values (
  'dba',
- 'ground0',
- 'Susie White',
- 'Oracle2ndShift',
- 'PO Box 465',
- 'Murphys, CA 95247',
- '',
- '(209)890-3041',
- '(209)890-3042',
+ '<change me>',
+ '<your name>',
+ '<your company>',
+ '<your address 1>',
+ '<your address 2>',
+ '<your address 3>',
+ '<your phone>',
+ '<your 2nd phone>',
  '');
 
 -- active boolean, 1=true, 0=false
@@ -114,7 +115,7 @@ create table ShoeboxAI.acct (
   primary key (id)
 ) engine=InnoDB default charset=latin1 comment 'Chart of accounts';
 
--- income
+-- default chart of accounts
 delete from ShoeboxAI.acct;
 insert into ShoeboxAI.acct (id,level,name,atype,pid) values (100,1,'Income',                'i',0);
 insert into ShoeboxAI.acct (id,level,name,atype,pid) values (101,2,'Gross receipts',        'i',100);
@@ -209,7 +210,8 @@ insert into ShoeboxAI.acct (id,level,name,atype,pid) values (900,2,'Other',     
 -- Non-zero numbers in subcategories
 --  select concat(a.id,'-',a.name,space(a.level*5),ShoeboxAI.acct_get_sum(a.id,'2015-1-1','2015-12-31')) from  ShoeboxAI.acct a having (ShoeboxAI.acct_get_sum(a.id,'2015-1-1','2015-12-31')>0 or a.level<3) and a.atype='i';
 
--- Schedule E entities: rentals, royalties, partnerships, S-corps, trusts.
+-- Entities are any way of organizing your records to meet your needs.  e.g. by Schedule C and E
+--   rentals, royalties, partnerships, S-corps, trusts.
 -- The 'code' column is the value stored in inv.entity_id and the v_schedE
 -- form option value. A tax preparer rebrands the seed rows in place to match
 -- the client's actual properties / K-1 issuers.
@@ -234,8 +236,9 @@ create table ShoeboxAI.entities (
   notes             varchar(255),
   active_flag       integer (1) not null default 1,
   primary key (code)
-) engine=InnoDB default charset=latin1 comment 'Schedule E entities';
+) engine=InnoDB default charset=latin1 comment 'Schedule entities';
 
+-- edit this list to meet your preferences.  
 insert into ShoeboxAI.entities (code,name,entity_type) values
   ('Rental1',      'Rental Property 1',  'Rental'),
   ('Rental2',      'Rental Property 2',  'Rental'),
@@ -247,7 +250,8 @@ insert into ShoeboxAI.entities (code,name,entity_type) values
   ('EstateTrust',  'Estate or Trust',    'EstateTrust'),
   ('OtherEntity',  'Other Entity',       'Other');
 
--- auto pay boolean is for ap primarily, entity_id=Schedule E entity code, cid=customer id
+-- recur: 0=none, 1=monthly, 2=weekly, 4=daily (see @invrecur_* above)
+-- entity_id=Schedule E entity code, cid=customer id
 select 'Create ShoeboxAI.inv';
 create table ShoeboxAI.inv (
   id         integer not null auto_increment,
@@ -258,7 +262,7 @@ create table ShoeboxAI.inv (
   amt        decimal (9,2) not null default 0,
   acct       integer not null default 0,
   balance    decimal (9,2),
-  auto       integer (1) not null default 1,
+  recur      integer not null default 0,
   primary key (id)
 ) engine=InnoDB default charset=latin1 comment 'Invoices';
 

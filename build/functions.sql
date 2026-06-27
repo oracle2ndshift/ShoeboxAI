@@ -1,10 +1,11 @@
 --
 -- function ShoeboxAI.acct_get_parent
 --
-drop function ShoeboxAI.acct_get_parent;
+drop function if exists ShoeboxAI.acct_get_parent ;
 delimiter $$
 create function ShoeboxAI.acct_get_parent(v_id varchar(4))
 returns varchar(4) 
+READS SQL DATA
 begin
   declare v_pid varchar(4);
   select pid into v_pid from ShoeboxAI.acct where id=v_id;
@@ -16,7 +17,7 @@ delimiter ;
 --
 -- function  ShoeboxAI.acct_get_sum
 --
-drop function ShoeboxAI.acct_get_sum;
+drop function if exists ShoeboxAI.acct_get_sum ;
 delimiter $$
 create function ShoeboxAI.acct_get_sum(
    v_id integer,
@@ -24,6 +25,7 @@ create function ShoeboxAI.acct_get_sum(
    v_edate date,
    v_entity_id varchar(8))
 returns decimal(12,2)
+READS SQL DATA
 begin
   -- local vars
   declare v_total decimal(12,2) default 0;
@@ -60,7 +62,7 @@ end;
 $$
 delimiter ;
 
-drop function ShoeboxAI.acct_get_sum2;
+drop function if exists ShoeboxAI.acct_get_sum2 ;
 delimiter $$
 create function ShoeboxAI.acct_get_sum2(
    v_id integer,
@@ -68,6 +70,7 @@ create function ShoeboxAI.acct_get_sum2(
    v_edate date, 
    v_entity_id varchar(8))
 returns decimal(12,2)
+READS SQL DATA
 begin
   -- local vars
   declare v_total decimal(12,2) default 0;
@@ -104,7 +107,7 @@ end;
 $$
 delimiter ;
 
-drop function ShoeboxAI.acct_get_sum3;
+drop function if exists ShoeboxAI.acct_get_sum3 ;
 delimiter $$
 create function ShoeboxAI.acct_get_sum3(
    v_id integer,
@@ -112,6 +115,7 @@ create function ShoeboxAI.acct_get_sum3(
    v_edate date, 
    v_entity_id varchar(8))
 returns decimal(12,2)
+READS SQL DATA
 begin
   -- local vars
   declare v_total decimal(12,2) default 0;
@@ -148,7 +152,7 @@ end;
 $$
 delimiter ;
 
-drop function ShoeboxAI.acct_get_sum4;
+drop function if exists ShoeboxAI.acct_get_sum4 ;
 delimiter $$
 create function ShoeboxAI.acct_get_sum4(
    v_id integer,
@@ -156,6 +160,7 @@ create function ShoeboxAI.acct_get_sum4(
    v_edate date, 
    v_entity_id varchar(8))
 returns decimal(12,2)
+READS SQL DATA
 begin
   -- local vars
   declare v_total decimal(12,2) default 0;
@@ -176,12 +181,13 @@ end;
 $$
 delimiter ; 
 
-drop procedure ShoeboxAI.rpt_gl;
+drop procedure if exists ShoeboxAI.rpt_gl ;
 delimiter $$
 create procedure ShoeboxAI.rpt_gl(
    v_entity_id varchar(8),
    v_type integer,
    v_year integer)
+READS SQL DATA
 begin
   --
   -- increment the running total
@@ -214,7 +220,7 @@ select a.id acct,
      a.name      name,
      a.atype     type,
      a.level     level,
-     ShoeboxAI.acct_get_sum(a.id,'','','Hoff') amt 
+     ShoeboxAI.acct_get_sum(a.id,'2026-12-01','2026-12-31','Hoff') amt 
      from ShoeboxAI.acct a 
      order by a.id;
 
@@ -222,11 +228,12 @@ select a.id acct,
 --
 -- procedure ShoeboxAI.get_open returns open invoices by entity_id and type
 --
-drop procedure ShoeboxAI.get_open;
+drop procedure if exists ShoeboxAI.get_open ;
 delimiter $$
 create procedure ShoeboxAI.get_open(
    v_entity_id varchar(8),
    v_type integer)
+READS SQL DATA
 begin
   --
   -- increment the running total
@@ -243,11 +250,12 @@ delimiter ;
 --
 -- procedure ShoeboxAI.rpt_per_company(Company,year)
 --
-drop procedure ShoeboxAI.rpt_per_company;
+drop procedure if exists ShoeboxAI.rpt_per_company;
 delimiter $$
 create procedure ShoeboxAI.rpt_per_company(
   v_comp varchar(50),
   v_year integer)
+READS SQL DATA
 begin
   select i.id 'InvNo',
          i.cid 'CompNo',
@@ -271,11 +279,12 @@ delimiter ;
 --
 -- procedure ShoeboxAI.rpt_sched_e(Company,year)
 --
-drop procedure ShoeboxAI.rpt_sched_e;
+drop procedure if exists ShoeboxAI.rpt_sched_e;
 delimiter $$
 create procedure ShoeboxAI.rpt_sched_e(
   v_comp varchar(50),
   v_year integer) 
+READS SQL DATA
 begin
   select i.id 'InvNo',
          i.cid 'CompNo',
@@ -300,10 +309,11 @@ delimiter ;
 --
 -- procedure ShoeboxAI.rpt_debug(Company,year)
 --
-drop procedure ShoeboxAI.rpt_debug;
+drop procedure if exists ShoeboxAI.rpt_debug;
 delimiter $$
 create procedure ShoeboxAI.rpt_debug(
   v_year integer)
+READS SQL DATA
 begin
   select i.id 'InvNo',
          i.cid 'CompNo',
